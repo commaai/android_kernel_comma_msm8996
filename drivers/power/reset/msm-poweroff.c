@@ -59,7 +59,7 @@ static void scm_disable_sdi(void);
  * There is no API from TZ to re-enable the registers.
  * So the SDI cannot be re-enabled when it already by-passed.
 */
-static int download_mode = 1;
+static int download_mode = !IS_ENABLED(CONFIG_MACH_COMMA);
 static struct kobject dload_kobj;
 
 #ifdef CONFIG_MSM_DLOAD_MODE
@@ -288,6 +288,11 @@ static void msm_restart_prepare(const char *cmd)
 				(cmd != NULL && cmd[0] != '\0'));
 	}
 
+#ifdef CONFIG_MACH_COMMA
+	/* To preserve console-ramoops */
+	need_warm_reset = true;
+#endif
+
 	/* Hard reset the PMIC unless memory contents must be maintained. */
 	if (need_warm_reset) {
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_WARM_RESET);
@@ -295,6 +300,11 @@ static void msm_restart_prepare(const char *cmd)
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_HARD_RESET);
 	}
 
+#ifdef CONFIG_MACH_COMMA
+	if (in_panic)
+		__raw_writel(0x77665501, restart_reason);
+	else
+#endif
 	if (cmd != NULL) {
 		if (!strncmp(cmd, "bootloader", 10)) {
 			qpnp_pon_set_restart_reason(
