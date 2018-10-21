@@ -22,4 +22,28 @@
 	model = "Letv Technologies, Inc. MSM 8996pro + PMI8996 LE_ZL1";
 	compatible = "qcom,msm8996-mtp", "qcom,msm8996", "qcom,mtp";
 	qcom,board-id = <8 0xA1>, <8 0xA2>, <8 0xA4>, <8 0xA5>;
+
+	reserved-memory {
+		ramoops_mem: ramoops_region@91500000 {
+			compatible = "shared-dma-pool";
+			no-map;
+			reg = <0 0x91500000 0 0x00100000>;
+			label = "ramoops_mem";
+		};
+	};
+};
+
+&soc {
+	ramoops {
+		compatible = "ramoops";
+		status = "ok";
+		android,ramoops-buffer-start = <0x91500000>;
+		android,ramoops-buffer-size =  <0x100000>;
+		android,ramoops-console-size = <0x60000>;
+		android,ramoops-record-size = <0x10000>;
+		android,ramoops-ftrace-size = <0x10000>;
+		android,ramoops-pmsg-size = <0x20000>;
+		android,ramoops-dump-oops = <0x1>;
+		memory-region = <&ramoops_mem>;
+	};
 };
