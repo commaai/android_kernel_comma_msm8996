@@ -1,0 +1,68 @@
+/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&mdss_mdp {
+	dsi_s6d6fa1_1080p_video: qcom,mdss_dsi_s6d6fa1_1080p_video {
+		qcom,cont-splash-enabled;
+		qcom,mdss-dsi-panel-name = "mdss_dsi_s6d6fa1_1080p_video";
+		qcom,mdss-dsi-panel-type = "dsi_video_mode";
+		qcom,mdss-dsi-traffic-mode = "burst_mode";
+		qcom,mdss-dsi-panel-destination = "display_1";
+		qcom,mdss-dsi-panel-width = <1080>;
+		qcom,mdss-dsi-panel-height = <1920>;
+		qcom,mdss-dsi-panel-framerate = <57>;
+		qcom,mdss-dsi-h-back-porch = <52>;
+		qcom,mdss-dsi-h-front-porch = <216>;
+		qcom,mdss-dsi-h-pulse-width = <16>;
+		qcom,mdss-dsi-h-sync-pulse = <1>;
+		qcom,mdss-dsi-v-back-porch = <3>;
+		qcom,mdss-dsi-v-front-porch = <4>;
+		qcom,mdss-dsi-v-pulse-width = <1>;
+		qcom,mdss-dsi-bpp = <24>;
+		qcom,mdss-dsi-bllp-eof-power-mode;
+		qcom,mdss-dsi-bllp-power-mode;
+		qcom,mdss-dsi-lane-0-state;
+		qcom,mdss-dsi-lane-1-state;
+		qcom,mdss-dsi-lane-2-state;
+		qcom,mdss-dsi-lane-3-state;
+		qcom,mdss-dsi-reset-sequence = <1 5>, <0 5>, <1 5>;
+		qcom,mdss-dsi-t-clk-post = <0x03>;
+		qcom,mdss-dsi-t-clk-pre = <0x2b>;
+		qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_wled";
+		qcom,mdss-dsi-bl-min-level = <1>;
+		qcom,mdss-dsi-bl-max-level = <4095>;
+		qcom,mdss-dsi-mdp-trigger = "none";
+		qcom,mdss-dsi-off-command-state = "dsi_hs_mode";
+		qcom,mdss-dsi-panel-timings = [
+			E6 38 26 00 68 6E 2A 3C 2C 03 04 00
+		];
+		qcom,mdss-dsi-on-command = [
+			05 01 00 00 78 00 01 11
+			05 01 00 00 14 00 01 29
+			29 01 00 00 00 00 03 F0 A5 A5
+			29 01 00 00 00 00 03 F1 A5 A5
+			29 01 00 00 00 00 03 FC A5 A5
+		];
+		qcom,mdss-dsi-off-command = [
+			05 01 00 00 32 00 02 28 00
+			05 01 00 00 78 00 02 10 00
+		];
+		qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+		qcom,mdss-dsi-panel-timings-8996 = [
+			24 1f 08 09 05 03 04 a0
+			24 1f 08 09 05 03 04 a0
+			24 1f 08 09 05 03 04 a0
+			24 1f 08 09 05 03 04 a0
+			24 1b 08 09 05 03 04 a0
+		];
+	};
+};
