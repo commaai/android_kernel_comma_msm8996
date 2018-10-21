@@ -47,3 +47,7 @@
 		memory-region = <&ramoops_mem>;
 	};
 };
+
+&usb3 {
+	/delete-property/ vbus_dwc3-supply;
+};
