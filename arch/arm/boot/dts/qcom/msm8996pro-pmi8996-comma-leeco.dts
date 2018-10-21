@@ -33,7 +33,97 @@
 	};
 };
 
+&tlmm {
+	synaptics_irq {
+		synaptics_irq_active: synaptics_irq_active {
+			mux {
+				pins = "gpio125";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio125";
+				bias-pull-up;
+				drive-strength = <16>;
+				input-low;
+			};
+		};
+
+		synaptics_irq_suspend: synaptics_irq_suspend {
+			mux {
+				pins = "gpio125";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio125";
+				bias-disable;
+				bias-pull-down;
+				drive-strength = <2>;
+				input-high;
+			};
+		};
+	};
+
+	synaptics_reset {
+		synaptics_reset_active: synaptics_reset_active {
+			mux {
+				pins = "gpio89";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio89";
+				bias-pull-up;
+				drive-strength = <16>;
+				output-low;
+			};
+		};
+
+		synaptics_reset_suspend: synaptics_reset_suspend {
+			mux {
+				pins = "gpio89";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio89";
+				bias-disable;
+				bias-pull-down;
+				drive-strength = <2>;
+				output-high;
+			};
+		};
+	};
+};
+
 &soc {
+	i2c@75ba000 {
+		/delete-node/ synaptics@20;
+
+		synaptics_dsx@20 {
+			compatible = "synaptics,dsx-i2c";
+			reg = <0x20>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <125 0x2008>;
+			pinctrl-names = "pmx_ts_active","pmx_ts_suspend";
+			pinctrl-0 = <&synaptics_irq_active &synaptics_reset_active>;
+			pinctrl-1 = <&synaptics_irq_suspend &synaptics_reset_suspend>;
+			vdd_ana-supply = <&pm8994_l22>;
+			vcc_i2c-supply = <&pm8994_l14>;
+			synaptics,pwr-reg-name = "vdd_ana";
+			synaptics,bus-reg-name = "vcc_i2c";
+			synaptics,reset-gpio = <&tlmm 89 0x00>;
+			synaptics,irq-gpio = <&tlmm 125 0x2008>;
+			synaptics,irq-on-state = <0>;
+			synaptics,irq-flags = <0x2008>;
+			synaptics,power-delay-ms = <200>;
+			synaptics,reset-delay-ms = <200>;
+			synaptics,reset-on-state = <0>;
+			synaptics,reset-active-ms = <20>;
+			synaptics,disable-gpios;
+			synaptics,cap-button-codes = <580 172 158>;
+			synaptics,driver-line-num = <31>;
+			synaptics,sense-line-num = <20>;
+		};
+	};
+
 	ramoops {
 		compatible = "ramoops";
 		status = "ok";
