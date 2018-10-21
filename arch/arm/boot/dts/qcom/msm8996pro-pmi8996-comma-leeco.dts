@@ -124,6 +124,10 @@
 		};
 	};
 
+	qcom,cnss {
+		/delete-property/ qcom,wlan-ramdump-dynamic;
+	};
+
 	ramoops {
 		compatible = "ramoops";
 		status = "ok";
