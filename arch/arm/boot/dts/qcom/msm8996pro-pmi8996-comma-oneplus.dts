@@ -82,4 +82,8 @@
 			pinctrl-1 = <&ts_suspend>;
 		};
 	};
+
+	qcom,cnss {
+		/delete-property/ qcom,wlan-ramdump-dynamic;
+	};
 };
