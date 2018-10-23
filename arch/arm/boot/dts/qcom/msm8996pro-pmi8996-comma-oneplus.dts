@@ -29,3 +29,57 @@
 &pil_gpu {
 	qcom,firmware-name = "a530_zap-pro";
 };
+
+&tlmm {
+	ts_mux {
+		ts_active: ts_active {
+			mux {
+				pins = "gpio89", "gpio125","gpio49";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio89", "gpio125","gpio49";
+				drive-strength = <16>;
+				bias-pull-up;
+			};
+		};
+
+		ts_suspend: ts_suspend {
+			mux {
+				pins = "gpio89", "gpio125","gpio49";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio89", "gpio125","gpio49";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+};
+
+&soc {
+	i2c@75ba000 {
+		/delete-node/ synaptics@20;
+
+		synaptics-rmi-ts@20 {
+			compatible = "synaptics,s3320";
+			reg = <0x20>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <125 0x2008>;
+			synaptics,irq-gpio = <&tlmm 125 0x2008>;
+			synaptics,reset-gpio = <&tlmm 89 0x00>;
+			synaptics,1v8-gpio = <&tlmm 49 0x00>;
+			synaptics,tx-rx-num = <16 28>;
+			synaptics,display-coords = <1080 1920>;
+			vdd_2v8-supply = <&pm8994_l22>;
+			vcc_i2c_1v8-supply = <&pm8994_s4>;
+			oem,support_hw_poweroff;
+			pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
+			pinctrl-0 = <&ts_active>;
+			pinctrl-1 = <&ts_suspend>;
+		};
+	};
+};
