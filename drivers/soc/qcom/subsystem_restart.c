@@ -649,7 +649,11 @@ static void subsystem_powerup(struct subsys_device *dev, void *data)
 static int __find_subsys(struct device *dev, void *data)
 {
 	struct subsys_device *subsys = to_subsys(dev);
+#ifdef CONFIG_MACH_COMMA
+	return !!strstr(subsys->desc->name, data);
+#else
 	return !strcmp(subsys->desc->name, data);
+#endif
 }
 
 static struct subsys_device *find_subsys(const char *str)
