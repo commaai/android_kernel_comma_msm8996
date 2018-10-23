@@ -175,7 +175,8 @@ dtb-$(CONFIG_ARCH_MSM8909) += msm8909-pm8916-mtp.dtb \
 	apq8009w-wtp.dtb
 
 ifeq ($(CONFIG_MACH_COMMA),y)
-dtb-y := msm8996pro-pmi8996-comma-leeco.dtb
+dtb-y := msm8996pro-pmi8996-comma-leeco.dtb \
+	msm8996pro-pmi8996-comma-oneplus.dtb
 endif
 
 ifeq ($(CONFIG_ARM64),y)
