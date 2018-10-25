@@ -36,7 +36,9 @@
 #include "../codecs/wcd9xxx-common.h"
 #include "../codecs/wcd9330.h"
 #include "../codecs/wcd9335.h"
+#ifdef WSA881X_PA
 #include "../codecs/wsa881x.h"
+#endif
 
 #define DRV_NAME "msm8996-asoc-snd"
 
@@ -57,8 +59,10 @@
 #define ADSP_STATE_READY_TIMEOUT_MS    3000
 #define DEV_NAME_STR_LEN            32
 
+#ifdef WSA881X_PA
 #define WSA8810_NAME_1 "wsa881x.20170211"
 #define WSA8810_NAME_2 "wsa881x.20170212"
+#endif
 
 #ifdef CONFIG_MACH_COMMA
 extern int max98927_get_i2c_states(void);
@@ -1159,6 +1163,7 @@ static const struct soc_enum msm8996_mi2s_snd_enum[] = {
 };
 #endif
 
+#ifdef WSA881X_PA
 struct msm8996_wsa881x_dev_info {
 	struct device_node *of_node;
 	u32 index;
@@ -1166,6 +1171,7 @@ struct msm8996_wsa881x_dev_info {
 
 static struct snd_soc_aux_dev *msm8996_aux_dev;
 static struct snd_soc_codec_conf *msm8996_codec_conf;
+#endif
 
 struct msm8996_asoc_mach_data {
 	u32 mclk_freq;
@@ -1196,7 +1202,9 @@ static void *adsp_state_notifier;
 static void *def_tasha_mbhc_cal(void);
 static int msm_snd_enable_codec_ext_clk(struct snd_soc_codec *codec,
 					int enable, bool dapm);
+#ifdef WSA881X_PA
 static int msm8996_wsa881x_init(struct snd_soc_component *component);
+#endif
 
 /*
  * Need to report LINEIN
@@ -2293,6 +2301,7 @@ static int msm_proxy_tx_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 	return 0;
 }
 
+#ifdef CONFIG_SND_SOC_MSM_HDMI_CODEC_RX
 static int msm8996_hdmi_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 					      struct snd_pcm_hw_params *params)
 {
@@ -2313,6 +2322,7 @@ static int msm8996_hdmi_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 
 	return 0;
 }
+#endif
 
 static int msm_tx_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 				     struct snd_pcm_hw_params *params)
@@ -2780,7 +2790,9 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 	struct snd_soc_dapm_context *dapm = &codec->dapm;
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	struct snd_soc_dai *codec_dai = rtd->codec_dai;
+#ifdef WSA881X_PA
 	struct snd_soc_pcm_runtime *rtd_aux = rtd->card->rtd_aux;
+#endif
 	void *mbhc_calibration;
 	struct snd_card *card;
 	struct snd_info_entry *entry;
@@ -2957,6 +2969,7 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 
 	tasha_event_register(msm8996_tasha_codec_event_cb, rtd->codec);
 
+#ifdef WSA881X_PA
 	/*
 	 * Send speaker configuration only for WSA8810.
 	 * Defalut configuration is for WSA8815.
@@ -2968,6 +2981,8 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 			tasha_set_spkr_gain_offset(rtd->codec,
 						   RX_GAIN_OFFSET_M1P5_DB);
 	}
+#endif
+
 	codec_reg_done = true;
 
 	card = rtd->card->snd_card;
@@ -4483,6 +4498,7 @@ static struct snd_soc_dai_link msm8996_tasha_be_dai_links[] = {
 };
 
 static struct snd_soc_dai_link msm8996_hdmi_dai_link[] = {
+#ifdef CONFIG_SND_SOC_MSM_HDMI_CODEC_RX
 	/* HDMI BACK END DAI Link */
 	{
 		.name = LPASS_BE_HDMI,
@@ -4498,6 +4514,7 @@ static struct snd_soc_dai_link msm8996_hdmi_dai_link[] = {
 		.ignore_pmdown_time = 1,
 		.ignore_suspend = 1,
 	},
+#endif
 };
 
 #ifdef CONFIG_MACH_COMMA
@@ -4540,6 +4557,7 @@ static struct snd_soc_dai_link msm8996_tasha_dai_links[
 			 ARRAY_SIZE(msm8996_tasha_be_dai_links) +
 			 ARRAY_SIZE(msm8996_hdmi_dai_link)];
 
+#ifdef WSA881X_PA
 static int msm8996_wsa881x_init(struct snd_soc_component *component)
 {
 	u8 spkleft_ports[WSA881X_MAX_SWR_PORTS] = {100, 101, 102, 106};
@@ -4589,6 +4607,7 @@ static int msm8996_wsa881x_init(struct snd_soc_component *component)
 
 	return 0;
 }
+#endif
 
 struct snd_soc_card snd_soc_card_tasha_msm8996 = {
 	.name		= "msm8996-tasha-snd-card",
@@ -4815,6 +4834,7 @@ static struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 	return card;
 }
 
+#ifdef WSA881X_PA
 static int msm8996_init_wsa_dev(struct platform_device *pdev,
 				struct snd_soc_card *card)
 {
@@ -4976,6 +4996,7 @@ static int msm8996_init_wsa_dev(struct platform_device *pdev,
 
 	return 0;
 }
+#endif
 
 static int msm8996_asoc_machine_probe(struct platform_device *pdev)
 {
@@ -5057,9 +5078,11 @@ static int msm8996_asoc_machine_probe(struct platform_device *pdev)
 		goto err;
 	}
 
+#ifdef WSA881X_PA
 	ret = msm8996_init_wsa_dev(pdev, card);
 	if (ret)
 		goto err;
+#endif
 
 	pdata->hph_en1_gpio = of_get_named_gpio(pdev->dev.of_node,
 						"qcom,hph-en1-gpio", 0);
