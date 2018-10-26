@@ -22,6 +22,7 @@
 #include <linux/module.h>
 #include <linux/switch.h>
 #include <linux/input.h>
+#include <linux/comma_board.h>
 #include <sound/core.h>
 #include <sound/soc.h>
 #include <sound/soc-dapm.h>
@@ -134,6 +135,7 @@ static const struct soc_enum msm8996_auxpcm_enum[] = {
 		SOC_ENUM_SINGLE_EXT(2, auxpcm_rate_text),
 };
 
+#ifndef CONFIG_MACH_COMMA
 static struct afe_clk_set mi2s_tx_clk = {
 	AFE_API_VERSION_I2S_CONFIG,
 	Q6AFE_LPASS_CLK_ID_TER_MI2S_IBIT,
@@ -142,8 +144,7 @@ static struct afe_clk_set mi2s_tx_clk = {
 	Q6AFE_LPASS_CLK_ROOT_DEFAULT,
 	0,
 };
-
-#ifdef CONFIG_MACH_COMMA
+#else
 static int pri_mi2s_sample_rate = SAMPLING_RATE_48KHZ;
 static int sec_mi2s_sample_rate = SAMPLING_RATE_48KHZ;
 static int tert_mi2s_sample_rate = SAMPLING_RATE_48KHZ;
@@ -1079,6 +1080,10 @@ static void msm8996_mi2s_snd_shutdown_many(struct snd_pcm_substream *substream,
 	}
 }
 
+#ifdef CONFIG_MACH_COMMA
+extern void tfa98xx_play_stop(void);
+#endif
+
 static void msm8996_mi2s_snd_shutdown_tert(struct snd_pcm_substream *substream,
 			int port_id, struct msm_mi2s_data *msm_mi2s_data)
 {
@@ -1091,6 +1096,11 @@ static void msm8996_mi2s_snd_shutdown_tert(struct snd_pcm_substream *substream,
 	pr_info("%s: dai name %s %p  substream = %s  stream = %d port_id = %d\n",
 		 __func__, cpu_dai->name, cpu_dai->dev,substream->name,
 		 substream->stream, port_id);
+
+#ifdef CONFIG_MACH_COMMA
+	if (comma_board_id() == COMMA_BOARD_ONEPLUS)
+		tfa98xx_play_stop();
+#endif
 
 	if (atomic_dec_return(&msm_mi2s_data->mi2s_rsc_ref) == 0) {
 		msm_mi2s_data->mi2s_clk.enable = 0;
@@ -2324,6 +2334,7 @@ static int msm8996_hdmi_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 }
 #endif
 
+#ifndef CONFIG_MACH_COMMA
 static int msm_tx_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 				     struct snd_pcm_hw_params *params)
 {
@@ -2379,6 +2390,7 @@ static struct snd_soc_ops msm8996_mi2s_be_ops = {
 	.startup = msm8996_mi2s_snd_startup,
 	.shutdown = msm8996_mi2s_snd_shutdown,
 };
+#endif
 
 static int msm_slim_5_rx_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 					    struct snd_pcm_hw_params *params)
@@ -4251,20 +4263,6 @@ static struct snd_soc_dai_link msm8996_common_be_dai_links[] = {
 		.be_hw_params_fixup = msm_be_hw_params_fixup,
 		.ignore_suspend = 1,
 	},
-	{
-		.name = LPASS_BE_TERT_MI2S_TX,
-		.stream_name = "Tertiary MI2S Capture",
-		.cpu_dai_name = "msm-dai-q6-mi2s.2",
-		.platform_name = "msm-pcm-routing",
-		.codec_name = "msm-stub-codec.1",
-		.codec_dai_name = "msm-stub-tx",
-		.no_pcm = 1,
-		.dpcm_capture = 1,
-		.be_id = MSM_BACKEND_DAI_TERTIARY_MI2S_TX,
-		.be_hw_params_fixup = msm_tx_be_hw_params_fixup,
-		.ops = &msm8996_mi2s_be_ops,
-		.ignore_suspend = 1,
-	},
 #ifdef CONFIG_MACH_COMMA
 	{
 		.name = LPASS_BE_TERT_MI2S_RX,
@@ -4277,35 +4275,21 @@ static struct snd_soc_dai_link msm8996_common_be_dai_links[] = {
 		.dpcm_playback = 1,
 		.be_id = MSM_BACKEND_DAI_TERTIARY_MI2S_RX,
 		.be_hw_params_fixup = msm_tert_mi2s_rx_be_hw_params_fixup,
-		.ops = &msm8996_mi2s_be_ops,
+		.ops = &msm8996_tert_mi2s_be_ops,
 		.ignore_suspend = 1,
 	},
 	{
-		.name = LPASS_BE_PRI_MI2S_RX,
-		.stream_name = "Primary MI2S Playback",
-		.cpu_dai_name = "msm-dai-q6-mi2s.0",
-		.platform_name = "msm-pcm-routing",
-		.codec_name = "msm-stub-codec.1",
-		.codec_dai_name = "msm-stub-rx",
-		.no_pcm = 1,
-		.dpcm_playback = 1,
-		.be_id = MSM_BACKEND_DAI_PRI_MI2S_RX,
-		.be_hw_params_fixup = msm_pri_mi2s_rx_be_hw_params_fixup,
-		.ops = &msm8996_pri_mi2s_be_ops,
-		.ignore_suspend = 1,
-	},
-	{
-		.name = LPASS_BE_PRI_MI2S_TX,
-		.stream_name = "Primary MI2S Capture",
-		.cpu_dai_name = "msm-dai-q6-mi2s.0",
+		.name = LPASS_BE_TERT_MI2S_TX,
+		.stream_name = "Tertiary MI2S Capture",
+		.cpu_dai_name = "msm-dai-q6-mi2s.2",
 		.platform_name = "msm-pcm-routing",
 		.codec_name = "msm-stub-codec.1",
 		.codec_dai_name = "msm-stub-tx",
 		.no_pcm = 1,
 		.dpcm_capture = 1,
-		.be_id = MSM_BACKEND_DAI_PRI_MI2S_TX,
-		.be_hw_params_fixup = msm_pri_mi2s_tx_be_hw_params_fixup,
-		.ops = &msm8996_pri_mi2s_be_ops,
+		.be_id = MSM_BACKEND_DAI_TERTIARY_MI2S_TX,
+		.be_hw_params_fixup = msm_tert_mi2s_tx_be_hw_params_fixup,
+		.ops = &msm8996_tert_mi2s_be_ops,
 		.ignore_suspend = 1,
 	},
 	{
@@ -4336,8 +4320,56 @@ static struct snd_soc_dai_link msm8996_common_be_dai_links[] = {
 		.ops = &msm8996_quat_mi2s_be_ops,
 		.ignore_suspend = 1,
 	},
+#else
+	{
+		.name = LPASS_BE_TERT_MI2S_TX,
+		.stream_name = "Tertiary MI2S Capture",
+		.cpu_dai_name = "msm-dai-q6-mi2s.2",
+		.platform_name = "msm-pcm-routing",
+		.codec_name = "msm-stub-codec.1",
+		.codec_dai_name = "msm-stub-tx",
+		.no_pcm = 1,
+		.dpcm_capture = 1,
+		.be_id = MSM_BACKEND_DAI_TERTIARY_MI2S_TX,
+		.be_hw_params_fixup = msm_tx_be_hw_params_fixup,
+		.ops = &msm8996_mi2s_be_ops,
+		.ignore_suspend = 1,
+	},
 #endif
 };
+
+#ifdef CONFIG_MACH_COMMA
+static struct snd_soc_dai_link leeco_be_dai_links[] = {
+	{
+		.name = LPASS_BE_PRI_MI2S_RX,
+		.stream_name = "Primary MI2S Playback",
+		.cpu_dai_name = "msm-dai-q6-mi2s.0",
+		.platform_name = "msm-pcm-routing",
+		.codec_name = "msm-stub-codec.1",
+		.codec_dai_name = "msm-stub-rx",
+		.no_pcm = 1,
+		.dpcm_playback = 1,
+		.be_id = MSM_BACKEND_DAI_PRI_MI2S_RX,
+		.be_hw_params_fixup = msm_pri_mi2s_rx_be_hw_params_fixup,
+		.ops = &msm8996_pri_mi2s_be_ops,
+		.ignore_suspend = 1,
+	},
+	{
+		.name = LPASS_BE_PRI_MI2S_TX,
+		.stream_name = "Primary MI2S Capture",
+		.cpu_dai_name = "msm-dai-q6-mi2s.0",
+		.platform_name = "msm-pcm-routing",
+		.codec_name = "msm-stub-codec.1",
+		.codec_dai_name = "msm-stub-tx",
+		.no_pcm = 1,
+		.dpcm_capture = 1,
+		.be_id = MSM_BACKEND_DAI_PRI_MI2S_TX,
+		.be_hw_params_fixup = msm_pri_mi2s_tx_be_hw_params_fixup,
+		.ops = &msm8996_pri_mi2s_be_ops,
+		.ignore_suspend = 1,
+	},
+};
+#endif
 
 static struct snd_soc_dai_link msm8996_tasha_be_dai_links[] = {
 	/* Backend DAI Links */
@@ -4517,40 +4549,10 @@ static struct snd_soc_dai_link msm8996_hdmi_dai_link[] = {
 #endif
 };
 
-#ifdef CONFIG_MACH_COMMA
-static struct snd_soc_dai_link msm8996_max98927_dai_link[] = {
-	{
-		.name = LPASS_BE_TERT_MI2S_RX,
-		.stream_name = "Tertiary MI2S Playback",
-		.cpu_dai_name = "msm-dai-q6-mi2s.2",
-		.platform_name = "msm-pcm-routing",
-		.codec_name = "max98927.9-003a",
-		.codec_dai_name = "max98927-aif1",
-		.no_pcm = 1,
-		.dpcm_playback = 1,
-		.be_id = MSM_BACKEND_DAI_TERTIARY_MI2S_RX,
-		.be_hw_params_fixup = msm_tert_mi2s_rx_be_hw_params_fixup,
-		.ops = &msm8996_tert_mi2s_be_ops,
-		.ignore_suspend = 1,
-	},
-	{
-		.name = LPASS_BE_TERT_MI2S_TX,
-		.stream_name = "Tertiary MI2S Capture",
-		.cpu_dai_name = "msm-dai-q6-mi2s.2",
-		.platform_name = "msm-pcm-routing",
-		.codec_name = "max98927.9-003a",
-		.codec_dai_name = "max98927-aif1",
-		.no_pcm = 1,
-		.dpcm_capture = 1,
-		.be_id = MSM_BACKEND_DAI_TERTIARY_MI2S_TX,
-		.be_hw_params_fixup = msm_tert_mi2s_tx_be_hw_params_fixup,
-		.ops = &msm8996_tert_mi2s_be_ops,
-		.ignore_suspend = 1,
-	},
-};
-#endif
-
 static struct snd_soc_dai_link msm8996_tasha_dai_links[
+#ifdef CONFIG_MACH_COMMA
+			 ARRAY_SIZE(leeco_be_dai_links) +
+#endif
 			 ARRAY_SIZE(msm8996_common_dai_links) +
 			 ARRAY_SIZE(msm8996_tasha_fe_dai_links) +
 			 ARRAY_SIZE(msm8996_common_be_dai_links) +
@@ -4613,6 +4615,10 @@ struct snd_soc_card snd_soc_card_tasha_msm8996 = {
 	.name		= "msm8996-tasha-snd-card",
 };
 
+#ifdef CONFIG_MACH_COMMA
+extern struct device_node *tfa_codec_np;
+#endif
+
 static int msm8996_populate_dai_link_component_of_node(
 					struct snd_soc_card *card)
 {
@@ -4674,6 +4680,16 @@ static int msm8996_populate_dai_link_component_of_node(
 				dai_link[i].cpu_dai_name = NULL;
 			}
 		}
+
+#ifdef CONFIG_MACH_COMMA
+		if (comma_board_id() == COMMA_BOARD_ONEPLUS &&
+			!strcmp(dai_link[i].stream_name, "Quaternary MI2S Playback")) {
+			dai_link[i].codec_name = NULL;
+			dai_link[i].codec_dai_name = "tfa98xx_codec";
+			dai_link[i].codec_of_node = tfa_codec_np;
+			continue;
+		}
+#endif
 
 		/* populate codec_of_node for snd card dai links */
 		if (dai_link[i].codec_name && !dai_link[i].codec_of_node) {
@@ -4804,25 +4820,22 @@ static struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 	}
 
 #ifdef CONFIG_MACH_COMMA
-	if (of_property_read_bool(dev->of_node, "letv,smartpa-audio-max98927")) {
+	if (comma_board_id() == COMMA_BOARD_LEECO) {
 		int i;
-		pr_info( "%s(): max98927 smartpa audio support present\n",
-				__func__);
-		for (i = 0; i < len_4; i++) {
-			if (MSM_BACKEND_DAI_TERTIARY_MI2S_RX == dailink[i].be_id
-				&& !strcmp(dailink[i].cpu_dai_name, "msm-dai-q6-mi2s.2")
-				&& !max98927_get_i2c_states()) {
-				pr_info("MSM_BACKEND_DAI_TERTIARY_MI2S_RX matched %s\n", dailink[i].cpu_dai_name);
-				dailink[i] = msm8996_max98927_dai_link[0];
-			}
 
-			if (MSM_BACKEND_DAI_TERTIARY_MI2S_TX == dailink[i].be_id
-				&& !strcmp(dailink[i].cpu_dai_name, "msm-dai-q6-mi2s.2")
-				&& !max98927_get_i2c_states()) {
-				pr_info("MSM_BACKEND_DAI_TERTIARY_MI2S_TX matched %s\n", dailink[i].cpu_dai_name);
-				dailink[i] = msm8996_max98927_dai_link[1];
+		for (i = 0; i < len_4; i++) {
+			const char *stream = dailink[i].stream_name;
+
+			if (!strcmp(stream, "Tertiary MI2S Playback") ||
+				!strcmp(stream, "Tertiary MI2S Capture")) {
+				dailink[i].codec_name = "max98927.9-003a";
+				dailink[i].codec_dai_name = "max98927-aif1";
 			}
 		}
+
+		memcpy(dailink + len_4, leeco_be_dai_links,
+			sizeof(leeco_be_dai_links));
+		len_4 += ARRAY_SIZE(leeco_be_dai_links);
 	}
 #endif
 
@@ -5006,6 +5019,11 @@ static int msm8996_asoc_machine_probe(struct platform_device *pdev)
 	char *mclk_freq_prop_name;
 	const struct of_device_id *match;
 	int ret;
+
+#ifdef CONFIG_MACH_COMMA
+	if (comma_board_id() == COMMA_BOARD_ONEPLUS)
+		msm_quat_mi2s_rx_ch = 2;
+#endif
 
 	if (!pdev->dev.of_node) {
 		dev_err(&pdev->dev, "No platform supplied from device tree\n");

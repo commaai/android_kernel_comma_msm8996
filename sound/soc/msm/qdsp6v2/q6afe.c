@@ -20,6 +20,7 @@
 #include <linux/sched.h>
 #include <linux/msm_audio_ion.h>
 #include <linux/delay.h>
+#include <linux/comma_board.h>
 #include <sound/apr_audio-v2.h>
 #include <sound/q6afe-v2.h>
 #include <sound/q6audio-v2.h>
@@ -252,7 +253,8 @@ static int32_t sp_make_afe_callback(uint32_t *payload, uint32_t payload_size)
 		}
 	}
 #ifdef CONFIG_MACH_COMMA
-	if (AFE_PARAM_ID_DSM_CFG == param_id) {
+	if (comma_board_id() == COMMA_BOARD_LEECO &&
+		AFE_PARAM_ID_DSM_CFG == param_id) {
 		if (payload_size < sizeof(this_afe.calib_data)) {
 			pr_err("%s: Error: received size %d, calib_data size %zu\n",
 				__func__, payload_size,
