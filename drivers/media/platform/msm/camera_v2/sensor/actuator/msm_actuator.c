@@ -12,6 +12,7 @@
 
 #define pr_fmt(fmt) "%s:%d " fmt, __func__, __LINE__
 
+#include <linux/comma_board.h>
 #include <linux/module.h>
 #include "msm_sd.h"
 #include "msm_actuator.h"
@@ -47,6 +48,42 @@ static struct msm_actuator *actuators[] = {
 	&msm_hvcm_actuator_table,
 	&msm_bivcm_actuator_table,
 };
+
+#ifdef CONFIG_MACH_COMMA
+static int32_t msm_actuator_write_sequence(
+	struct msm_actuator_ctrl_t *a_ctrl,
+	uint16_t addr, uint8_t *data, uint32_t data_size)
+{
+	struct msm_camera_i2c_seq_reg_setting seq_reg_setting;
+	struct msm_camera_i2c_seq_reg_array *seq_reg_array;
+	int32_t i, rc;
+
+	if (data_size > I2C_SEQ_REG_DATA_MAX || !data)
+		return -EFAULT;
+
+	seq_reg_array = kmalloc(sizeof(*seq_reg_array), GFP_KERNEL);
+	if (!seq_reg_array)
+		return -ENOMEM;
+
+	seq_reg_array->reg_addr = addr;
+	for (i = 0; i < data_size; i++)
+		seq_reg_array->reg_data[i] = data[i];
+	seq_reg_array->reg_data_size = data_size;
+
+	seq_reg_setting.reg_setting = seq_reg_array;
+	seq_reg_setting.addr_type = a_ctrl->i2c_client.addr_type;
+	seq_reg_setting.size = 1;
+	seq_reg_setting.delay = 0;
+
+	rc = a_ctrl->i2c_client.i2c_func_tbl->
+		i2c_write_seq_table(&a_ctrl->i2c_client, &seq_reg_setting);
+	if (rc < 0)
+		pr_err("%s Failed I2C write Line %d\n", __func__, __LINE__);
+
+	kfree(seq_reg_array);
+	return rc;
+}
+#endif
 
 static int32_t msm_actuator_piezo_set_default_focus(
 	struct msm_actuator_ctrl_t *a_ctrl,
@@ -101,6 +138,34 @@ static void msm_actuator_parse_i2c_params(struct msm_actuator_ctrl_t *a_ctrl,
 	i2c_tbl = a_ctrl->i2c_reg_tbl;
 
 	for (i = 0; i < size; i++) {
+#ifdef CONFIG_MACH_COMMA
+		if (comma_board_id() == COMMA_BOARD_ONEPLUS) {
+			uint16_t j, reg_data[3], start;
+
+			value = (next_lens_position <<
+				write_arr[i].data_shift) |
+				((hw_dword & write_arr[i].hw_mask) >>
+				write_arr[i].hw_shift);
+
+			reg_data[0] = 0x90;
+			reg_data[1] = 0x00;
+			reg_data[2] = (value & 0xFF00) >> 8;
+			start = a_ctrl->i2c_tbl_index;
+			for (j = start; j < (start + 3); i++, j++) {
+				if (j > a_ctrl->total_steps) {
+					pr_err("failed:i2c table index out of bound\n");
+					return;
+				}
+				i2c_tbl[j].reg_addr = write_arr[i].reg_addr;
+				i2c_tbl[j].reg_data = reg_data[j - start];
+				i2c_tbl[j].delay = 0;
+			}
+
+			a_ctrl->i2c_tbl_index = j;
+			i2c_byte1 = write_arr[i].reg_addr;
+			i2c_byte2 = value & 0xFF;
+		} else
+#endif
 		if (write_arr[i].reg_write_type == MSM_ACTUATOR_WRITE_DAC) {
 			value = (next_lens_position <<
 				write_arr[i].data_shift) |
@@ -851,7 +916,11 @@ static int32_t msm_actuator_park_lens(struct msm_actuator_ctrl_t *a_ctrl)
 		}
 		a_ctrl->i2c_tbl_index = 0;
 		/* Use typical damping time delay to avoid tick sound */
+#ifdef CONFIG_MACH_COMMA
+		usleep_range(20000, 22000);
+#else
 		usleep_range(10000, 12000);
+#endif
 	}
 
 	return 0;
@@ -1136,6 +1205,31 @@ static int32_t msm_actuator_set_position(
 		pr_err("failed. Invalid actuator state.");
 		return -EFAULT;
 	}
+
+#ifdef CONFIG_MACH_COMMA
+	if (comma_board_id() == COMMA_BOARD_ONEPLUS) {
+		for (index = 0; index < set_pos->number_of_steps; index++) {
+			uint8_t data[4];
+
+			next_lens_position = set_pos->pos[index];
+
+			data[0] = 0x90;
+			data[1] = 0x00;
+			data[2] = next_lens_position >> 8;
+			data[3] = next_lens_position & 0xFF;
+
+			rc = msm_actuator_write_sequence(a_ctrl, 0xF0, data,
+							ARRAY_SIZE(data));
+			if (rc < 0) {
+				pr_err("%s Failed I2C write sequence Line %d\n",
+					__func__, __LINE__);
+				return rc;
+			}
+		}
+
+		return 0;
+	}
+#endif
 
 	a_ctrl->i2c_tbl_index = 0;
 	for (index = 0; index < set_pos->number_of_steps; index++) {

@@ -362,6 +362,10 @@ struct reg_settings_ois_t {
 	enum msm_camera_i2c_data_type data_type;
 	enum msm_ois_i2c_operation i2c_operation;
 	uint32_t delay;
+#ifdef CONFIG_MACH_COMMA
+	unsigned char reg_data_seq[128];
+	uint32_t reg_data_seq_size;
+#endif
 };
 
 struct msm_ois_params_t {
