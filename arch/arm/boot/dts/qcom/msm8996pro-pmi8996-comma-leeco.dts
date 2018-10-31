@@ -444,6 +444,99 @@
 	qcom,init-voltage = <1200000>;
 };
 
+&mtp_batterydata {
+	qcom,letv_zl1_lishen_4000mah {
+		qcom,battery-type = "letv_zl1_lishen";
+		qcom,batt-id-kohm = <68>;
+		qcom,chg-rslow-comp-c1 = <2912595>;
+		qcom,chg-rslow-comp-c2 = <3624753>;
+		qcom,chg-rslow-comp-thr = <0x99>;
+		qcom,chg-rs-to-rslow = <728776>;
+		qcom,chg-term-ua = <170000>;
+		qcom,max-voltage-uv = <4400000>;
+		qcom,fg-profile-data = [
+			 DC 83 9E 7C
+			 E5 80 D6 76
+			 62 83 A0 6F
+			 1D 89 46 94
+			 EB 81 44 9B
+			 2A BE 12 CB
+			 55 0F 02 88
+			 9E 7D 8C 81
+			 F3 77 4C 83
+			 21 71 64 39
+			 CA 7D 75 82
+			 56 98 BE B6
+			 0B C3 58 0F
+			 08 10 47 5A
+			 14 70 EE FC
+			 CD 3F 46 3F
+			 23 41 00 00
+			 FE 46 DD 38
+			 1E 2A 00 00
+			 00 00 00 00
+			 00 00 00 00
+			 50 6A F2 68
+			 2C 78 C0 8A
+			 E8 74 CA 69
+			 8B 61 1D 81
+			 02 74 C3 68
+			 AC 6F 97 A9
+			 1B 16 61 85
+			 5F A0 71 0C
+			 28 00 FF 36
+			 F0 11 30 03
+			 00 00 00 0C
+		];
+	};
+
+	qcom,letv_zl1_scud_4000mah {
+		qcom,battery-type = "letv_zl1_scud";
+		qcom,batt-id-kohm = <10>;
+		qcom,chg-rslow-comp-c1 = <2730925>;
+		qcom,chg-rslow-comp-c2 = <2908456>;
+		qcom,chg-rslow-comp-thr = <0x99>;
+		qcom,chg-rs-to-rslow = <757130>;
+		qcom,chg-term-ua = <170000>;
+		qcom,max-voltage-uv = <4400000>;
+		qcom,fg-profile-data = [
+			 E3 83 DE 7C
+			 1C 81 3F 77
+			 5B 83 A4 67
+			 FB 83 E0 8E
+			 6C 82 D8 93
+			 6E B5 0C C1
+			 52 17 11 88
+			 DB 7E 89 82
+			 F1 7C 4C 83
+			 82 71 F1 6E
+			 26 74 54 82
+			 77 99 B7 BC
+			 87 C9 5E 0D
+			 DD 0F CA 59
+			 14 70 EE FC
+			 F7 37 5F 3C
+			 3F 21 00 00
+			 9D 45 D9 33
+			 3E 2D 00 00
+			 00 00 00 00
+			 00 00 00 00
+			 43 6A E4 68
+			 75 71 8B 83
+			 90 6F E8 62
+			 F4 4B 9E 79
+			 87 6D 60 60
+			 82 75 7E 99
+			 1A 95 61 88
+			 5F A0 71 0C
+			 28 00 FF 36
+			 F0 11 30 03
+			 00 00 00 0C
+		];
+	};
+
+};
+
 &soc {
 	i2c_9: i2c@75b7000 {
 		compatible = "qcom,i2c-msm-v2";
