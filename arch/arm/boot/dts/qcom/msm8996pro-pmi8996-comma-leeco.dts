@@ -37,6 +37,10 @@
 	};
 };
 
+&adsp_mem {
+	size = <0 0x10000000>;
+};
+
 &tlmm {
 	/delete-node/ cam_sensor_front_active;
 	/delete-node/ cam_sensor_front_suspend;

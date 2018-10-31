@@ -30,6 +30,10 @@
 	};
 };
 
+&adsp_mem {
+	size = <0 0x10000000>;
+};
+
 &pil_gpu {
 	qcom,firmware-name = "a530_zap-pro";
 };
