@@ -277,6 +277,9 @@ struct smbchg_chip {
 	struct votable			*hw_aicl_rerun_disable_votable;
 	struct votable			*hw_aicl_rerun_enable_indirect_votable;
 	struct votable			*aicl_deglitch_short_votable;
+#ifdef CONFIG_MACH_COMMA
+	struct mutex			chg_lock;
+#endif
 };
 
 enum qpnp_schg {
@@ -921,6 +924,11 @@ static void read_usb_type(struct smbchg_chip *chip, char **usb_type_name,
 #define BAT_TCC_REACHED_BIT		BIT(7)
 static int get_prop_batt_status(struct smbchg_chip *chip)
 {
+#ifdef CONFIG_MACH_COMMA
+	if (chip->usb_present)
+		return POWER_SUPPLY_STATUS_CHARGING;
+	return POWER_SUPPLY_STATUS_DISCHARGING;
+#else
 	int rc, status = POWER_SUPPLY_STATUS_DISCHARGING;
 	u8 reg = 0, chg_type;
 	bool charger_present, chg_inhibit;
@@ -967,6 +975,7 @@ static int get_prop_batt_status(struct smbchg_chip *chip)
 out:
 	pr_smb_rt(PR_MISC, "CHGR_STS = 0x%02x\n", reg);
 	return status;
+#endif
 }
 
 #define BAT_PRES_STATUS			0x08
@@ -3596,6 +3605,10 @@ static void smbchg_external_power_changed(struct power_supply *psy)
 	enum power_supply_type usb_supply_type;
 	char *usb_type_name = "null";
 
+#ifdef CONFIG_MACH_COMMA
+	return;
+#endif
+
 	if (chip->bms_psy_name)
 		chip->bms_psy =
 			power_supply_get_by_name((char *)chip->bms_psy_name);
@@ -5632,6 +5645,50 @@ static int smbchg_get_iusb(struct smbchg_chip *chip)
 	return iusb_ua;
 }
 
+#ifdef CONFIG_MACH_COMMA
+static void smbchg_set_charge_ma(struct smbchg_chip *chip, int current_ma)
+{
+	int i, usb_cur_val;
+
+	for (i = 1; i < chip->tables.usb_ilim_ma_len; i++) {
+		if (current_ma < chip->tables.usb_ilim_ma_table[i])
+			break;
+	}
+
+	usb_cur_val = i - 1;
+	smbchg_sec_masked_write(chip, chip->chgr_base + FCC_CFG, FCC_MASK,
+				usb_cur_val);
+	smbchg_sec_masked_write(chip, chip->usb_chgpth_base + IL_CFG,
+				USBIN_INPUT_MASK, usb_cur_val);
+}
+
+static void smbchg_enable_charger(struct smbchg_chip *chip)
+{
+	smbchg_usb_suspend(chip, false);
+	smbchg_charging_en(chip, true);
+
+	smbchg_sec_masked_write(chip, chip->usb_chgpth_base + USB_AICL_CFG,
+				AICL_EN_BIT, 0);
+	smbchg_masked_write(chip, chip->usb_chgpth_base + CMD_IL,
+			USBIN_HC_MODE | ICL_OVERRIDE_BIT,
+			USBIN_HC_MODE | ICL_OVERRIDE_BIT);
+
+	smbchg_set_charge_ma(chip, 2200);
+	power_supply_changed(&chip->batt_psy);
+	set_property_on_fg(chip, POWER_SUPPLY_PROP_STATUS,
+			POWER_SUPPLY_STATUS_CHARGING);
+}
+
+static void smbchg_disable_charger(struct smbchg_chip *chip)
+{
+	set_property_on_fg(chip, POWER_SUPPLY_PROP_STATUS,
+			POWER_SUPPLY_STATUS_DISCHARGING);
+	power_supply_changed(&chip->batt_psy);
+	smbchg_charging_en(chip, false);
+	smbchg_usb_suspend(chip, true);
+}
+#endif
+
 static enum power_supply_property smbchg_battery_properties[] = {
 	POWER_SUPPLY_PROP_STATUS,
 	POWER_SUPPLY_PROP_PRESENT,
@@ -5669,6 +5726,30 @@ static int smbchg_battery_set_property(struct power_supply *psy,
 	int rc = 0;
 	struct smbchg_chip *chip = container_of(psy,
 				struct smbchg_chip, batt_psy);
+
+#ifdef CONFIG_MACH_COMMA
+	switch (prop) {
+	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
+		mutex_lock(&chip->chg_lock);
+		if (chip->usb_present) {
+			if (val->intval)
+				smbchg_enable_charger(chip);
+			else
+				smbchg_disable_charger(chip);
+		}
+		mutex_unlock(&chip->chg_lock);
+		break;
+	case POWER_SUPPLY_PROP_BATTERY_CHARGING_ENABLED:
+		mutex_lock(&chip->chg_lock);
+		smbchg_charging_en(chip, val->intval);
+		mutex_unlock(&chip->chg_lock);
+		break;
+	default:
+		break;
+	}
+
+	return 0;
+#endif
 
 	switch (prop) {
 	case POWER_SUPPLY_PROP_BATTERY_CHARGING_ENABLED:
@@ -6349,6 +6430,18 @@ out:
  */
 static irqreturn_t src_detect_handler(int irq, void *_chip)
 {
+#ifdef CONFIG_MACH_COMMA
+	struct smbchg_chip *chip = _chip;
+
+	mutex_lock(&chip->chg_lock);
+	chip->usb_present = is_src_detect_high(chip);
+	power_supply_set_present(chip->usb_psy, chip->usb_present);
+	if (chip->usb_present)
+		smbchg_enable_charger(chip);
+	else
+		smbchg_disable_charger(chip);
+	mutex_unlock(&chip->chg_lock);
+#else
 	struct smbchg_chip *chip = _chip;
 	bool usb_present = is_usb_present(chip);
 	bool src_detect = is_src_detect_high(chip);
@@ -6398,6 +6491,7 @@ static irqreturn_t src_detect_handler(int irq, void *_chip)
 		chip->aicl_irq_count = 0;
 	}
 out:
+#endif
 	return IRQ_HANDLED;
 }
 
@@ -6503,6 +6597,7 @@ static irqreturn_t usbid_change_handler(int irq, void *_chip)
 	return IRQ_HANDLED;
 }
 
+#ifndef CONFIG_MACH_COMMA
 static int determine_initial_status(struct smbchg_chip *chip)
 {
 	union power_supply_propval type = {0, };
@@ -6541,6 +6636,7 @@ static int determine_initial_status(struct smbchg_chip *chip)
 
 	return 0;
 }
+#endif
 
 static int prechg_time[] = {
 	24,
@@ -7474,6 +7570,18 @@ static int smbchg_request_irqs(struct smbchg_chip *chip)
 			return rc;
 		}
 
+#ifdef CONFIG_MACH_COMMA
+		if (subtype == SMBCHG_USB_CHGPTH_SUBTYPE) {
+			REQUEST_IRQ(chip, spmi_resource, chip->src_detect_irq,
+				"usbin-src-det",
+				src_detect_handler, flags, rc);
+			enable_irq_wake(chip->src_detect_irq);
+			break;
+		}
+
+		continue;
+#endif
+
 		switch (subtype) {
 		case SMBCHG_CHGR_SUBTYPE:
 		case SMBCHG_LITE_CHGR_SUBTYPE:
@@ -7675,6 +7783,7 @@ static int smbchg_parse_peripherals(struct smbchg_chip *chip)
 	return rc;
 }
 
+#ifndef CONFIG_MACH_COMMA
 static inline void dump_reg(struct smbchg_chip *chip, u16 addr,
 		const char *name)
 {
@@ -7737,6 +7846,7 @@ static int create_debugfs_entries(struct smbchg_chip *chip)
 	}
 	return 0;
 }
+#endif
 
 static int smbchg_check_chg_version(struct smbchg_chip *chip)
 {
@@ -7807,6 +7917,7 @@ static int smbchg_check_chg_version(struct smbchg_chip *chip)
 	return 0;
 }
 
+#ifndef CONFIG_MACH_COMMA
 static void rerun_hvdcp_det_if_necessary(struct smbchg_chip *chip)
 {
 	enum power_supply_type usb_supply_type;
@@ -7849,6 +7960,7 @@ static void rerun_hvdcp_det_if_necessary(struct smbchg_chip *chip)
 					rc);
 	}
 }
+#endif
 
 static int smbchg_probe(struct spmi_device *spmi)
 {
@@ -7973,6 +8085,9 @@ static int smbchg_probe(struct spmi_device *spmi)
 	if (IS_ERR(chip->aicl_deglitch_short_votable))
 		return PTR_ERR(chip->aicl_deglitch_short_votable);
 
+#ifdef CONFIG_MACH_COMMA
+	mutex_init(&chip->chg_lock);
+#endif
 	INIT_WORK(&chip->usb_set_online_work, smbchg_usb_update_online_work);
 	INIT_DELAYED_WORK(&chip->parallel_en_work,
 			smbchg_parallel_usb_en_work);
@@ -8034,12 +8149,14 @@ static int smbchg_probe(struct spmi_device *spmi)
 		goto out;
 	}
 
+#ifndef CONFIG_MACH_COMMA
 	rc = determine_initial_status(chip);
 	if (rc < 0) {
 		dev_err(&spmi->dev,
 			"Unable to determine init status rc = %d\n", rc);
 		goto out;
 	}
+#endif
 
 	chip->previous_soc = -EINVAL;
 	chip->batt_psy.name		= chip->battery_psy_name;
@@ -8097,12 +8214,18 @@ static int smbchg_probe(struct spmi_device *spmi)
 		}
 	}
 
+#ifdef CONFIG_MACH_COMMA
+	/* Determine initial charger state */
+	src_detect_handler(0, chip);
+#endif
+
 	rc = smbchg_request_irqs(chip);
 	if (rc < 0) {
 		dev_err(&spmi->dev, "Unable to request irqs rc = %d\n", rc);
 		goto unregister_led_class;
 	}
 
+#ifndef CONFIG_MACH_COMMA
 	if (!chip->skip_usb_notification) {
 		pr_smb(PR_MISC, "setting usb psy present = %d\n",
 			chip->usb_present);
@@ -8113,6 +8236,7 @@ static int smbchg_probe(struct spmi_device *spmi)
 
 	dump_regs(chip);
 	create_debugfs_entries(chip);
+#endif
 	dev_info(chip->dev,
 		"SMBCHG successfully probe Charger version=%s Revision DIG:%d.%d ANA:%d.%d batt=%d dc=%d usb=%d\n",
 			version_str[chip->schg_version],
