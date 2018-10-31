@@ -959,7 +959,7 @@ out:
 
 static void ramdump_work_handler(struct work_struct *ramdump)
 {
-#if !defined(HIF_SDIO)
+#if !defined(HIF_SDIO) && defined(DEBUG)
 	int ret;
 #endif
 	u_int32_t host_interest_address;
@@ -972,8 +972,7 @@ static void ramdump_work_handler(struct work_struct *ramdump)
 		printk("No RAM dump will be collected since ramdump_scn is NULL!\n");
 		goto out_fail;
 	}
-#if !defined(HIF_SDIO)
-#ifdef DEBUG
+#if !defined(HIF_SDIO) && defined(DEBUG)
 	ret = hif_pci_check_soc_status(ramdump_scn->hif_sc);
 	if (ret)
 		goto out_fail;
@@ -983,7 +982,6 @@ static void ramdump_work_handler(struct work_struct *ramdump)
 		goto out_fail;
 
 	dump_CE_debug_register(ramdump_scn->hif_sc);
-#endif
 #endif
 
 	if (HIFDiagReadMem(ramdump_scn->hif_hdl,

@@ -179,30 +179,28 @@ sysBbtProcessMessageCore(tpAniSirGlobal pMac, tpSirMsgQ pMsg, tANI_U32 type,
 
             if (subType == SIR_MAC_MGMT_DEAUTH)
             {
-                tpSirMacMgmtHdr pMacHdr = WDA_GET_RX_MAC_HEADER(pBd);
                 PELOGE(sysLog( pMac, LOGE,
                        FL("DEAUTH frame allowed: "
                        "da: " MAC_ADDRESS_STR ", "
                        "sa: " MAC_ADDRESS_STR ", "
                        "bssid: " MAC_ADDRESS_STR ", "
                        "DEAUTH count so far: %d\n"),
-                       MAC_ADDR_ARRAY(pMacHdr->da),
-                       MAC_ADDR_ARRAY(pMacHdr->sa),
-                       MAC_ADDR_ARRAY(pMacHdr->bssId),
+                       MAC_ADDR_ARRAY(WDA_GET_RX_MAC_HEADER(pBd)->da),
+                       MAC_ADDR_ARRAY(WDA_GET_RX_MAC_HEADER(pBd)->sa),
+                       MAC_ADDR_ARRAY(WDA_GET_RX_MAC_HEADER(pBd)->bssId),
                        pMac->sys.gSysFrameCount[type][subType] ););
             }
             if (subType == SIR_MAC_MGMT_DISASSOC)
             {
-                tpSirMacMgmtHdr pMacHdr = WDA_GET_RX_MAC_HEADER(pBd);
                 PELOGE(sysLog( pMac, LOGE,
                        FL("DISASSOC frame allowed: "
                        "da: " MAC_ADDRESS_STR ", "
                        "sa: " MAC_ADDRESS_STR ", "
                        "bssid: " MAC_ADDRESS_STR ", "
                        "DISASSOC count so far: %d\n"),
-                       MAC_ADDR_ARRAY(pMacHdr->da),
-                       MAC_ADDR_ARRAY(pMacHdr->sa),
-                       MAC_ADDR_ARRAY(pMacHdr->bssId),
+                       MAC_ADDR_ARRAY(WDA_GET_RX_MAC_HEADER(pBd)->da),
+                       MAC_ADDR_ARRAY(WDA_GET_RX_MAC_HEADER(pBd)->sa),
+                       MAC_ADDR_ARRAY(WDA_GET_RX_MAC_HEADER(pBd)->bssId),
                        pMac->sys.gSysFrameCount[type][subType] ););
             }
 

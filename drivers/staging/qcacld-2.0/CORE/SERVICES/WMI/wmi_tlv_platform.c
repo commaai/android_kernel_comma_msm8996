@@ -44,7 +44,7 @@
     Pronto and its future platforms) specific APIs */
   #define dummy_print(fmt, ...) {}
   #define wmi_tlv_print_verbose dummy_print
-  #define wmi_tlv_print_error   adf_os_print
+  #define wmi_tlv_print_error   dummy_print
   #define wmi_tlv_OS_MEMCPY     OS_MEMCPY
   #define wmi_tlv_OS_MEMZERO    OS_MEMZERO
   #define wmi_tlv_OS_MEMMOVE    OS_MEMMOVE

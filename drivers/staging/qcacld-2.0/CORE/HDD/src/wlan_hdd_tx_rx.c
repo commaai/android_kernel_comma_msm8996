@@ -1121,7 +1121,6 @@ VOS_STATUS hdd_Ibss_GetStaId(hdd_station_ctx_t *pHddStaCtx, v_MACADDR_t *pMacAdd
  */
 static void __hdd_tx_timeout(struct net_device *dev)
 {
-   hdd_adapter_t *pAdapter =  WLAN_HDD_GET_PRIV_PTR(dev);
    struct netdev_queue *txq;
    int i = 0;
 
@@ -1136,17 +1135,17 @@ static void __hdd_tx_timeout(struct net_device *dev)
 
    VOS_TRACE( VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_INFO,
               "num_bytes AC0: %d AC1: %d AC2: %d AC3: %d",
-              pAdapter->wmm_tx_queue[0].count,
-              pAdapter->wmm_tx_queue[1].count,
-              pAdapter->wmm_tx_queue[2].count,
-              pAdapter->wmm_tx_queue[3].count);
+              WLAN_HDD_GET_PRIV_PTR(dev)->wmm_tx_queue[0].count,
+              WLAN_HDD_GET_PRIV_PTR(dev)->wmm_tx_queue[1].count,
+              WLAN_HDD_GET_PRIV_PTR(dev)->wmm_tx_queue[2].count,
+              WLAN_HDD_GET_PRIV_PTR(dev)->wmm_tx_queue[3].count);
 
    VOS_TRACE( VOS_MODULE_ID_HDD_DATA, VOS_TRACE_LEVEL_INFO,
               "tx_suspend AC0: %d AC1: %d AC2: %d AC3: %d",
-              pAdapter->isTxSuspended[0],
-              pAdapter->isTxSuspended[1],
-              pAdapter->isTxSuspended[2],
-              pAdapter->isTxSuspended[3]);
+              WLAN_HDD_GET_PRIV_PTR(dev)->isTxSuspended[0],
+              WLAN_HDD_GET_PRIV_PTR(dev)->isTxSuspended[1],
+              WLAN_HDD_GET_PRIV_PTR(dev)->isTxSuspended[2],
+              WLAN_HDD_GET_PRIV_PTR(dev)->isTxSuspended[3]);
 
    for (i = 0; i < NUM_TX_QUEUES; i++) {
       txq = netdev_get_tx_queue(dev, i);
