@@ -444,6 +444,11 @@
 	qcom,init-voltage = <1200000>;
 };
 
+&msm_cpufreq {
+	qcom,cpufreq-table-0 = <1593600>;
+	qcom,cpufreq-table-2 = <1670400>;
+};
+
 &mtp_batterydata {
 	qcom,letv_zl1_lishen_4000mah {
 		qcom,battery-type = "letv_zl1_lishen";
