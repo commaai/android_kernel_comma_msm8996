@@ -612,7 +612,41 @@
 	};
 };
 
+&pm8994_gpios {
+	gpio@c200 {
+		qcom,mode = <0>;
+		qcom,pull = <0>;
+		qcom,vin-sel = <2>;
+		qcom,src-sel = <0>;
+		status = "okay";
+	};
+};
+
 &soc {
+	gpio_keys {
+		/delete-node/ cam_focus;
+		/delete-node/ cam_snapshot;
+		/delete-node/ vol_up;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8994_gpios 3 0x1>;
+			linux,input-type = <1>;
+			linux,code = <115>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+		};
+
+		vol_down {
+			label = "volume_down";
+			gpios = <&pm8994_gpios 2 0x1>;
+			linux,input-type = <1>;
+			linux,code = <114>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+		};
+	};
+
 	i2c_3: i2c@7577000 {
 		compatible = "qcom,i2c-msm-v2";
 		#address-cells = <1>;
@@ -762,6 +796,15 @@
 			pinctrl-names = "default", "sleep";
 			pinctrl-0 = <&quat_mi2s_active &quat_mi2s_sd0_active &quat_mi2s_sd1_active>;
 			pinctrl-1 = <&quat_mi2s_sleep &quat_mi2s_sd0_sleep &quat_mi2s_sd1_sleep>;
+		};
+	};
+};
+
+&spmi_bus {
+	qcom,pm8994@0 {
+		qcom,power-on@800 {
+			/delete-node/ qcom,pon_2;
+			/delete-node/ qcom,pon_3;
 		};
 	};
 };
