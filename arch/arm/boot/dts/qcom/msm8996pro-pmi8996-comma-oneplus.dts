@@ -28,6 +28,15 @@
 	aliases {
 		i2c3 = &i2c_3;
 	};
+
+	reserved-memory {
+		ramoops_mem: ramoops_region@ac000000 {
+			compatible = "shared-dma-pool";
+			no-map;
+			reg = <0 0xac000000 0 0x00200000>;
+			label = "ramoops_mem";
+		};
+	};
 };
 
 &adsp_mem {
@@ -659,6 +668,19 @@
 
 	qcom,cnss {
 		/delete-property/ qcom,wlan-ramdump-dynamic;
+	};
+
+	ramoops {
+		compatible = "ramoops";
+		status = "ok";
+		android,ramoops-buffer-start = <0xac000000>;
+		android,ramoops-buffer-size =  <0x200000>;
+		android,ramoops-console-size = <0x60000>;
+		android,ramoops-record-size = <0x10000>;
+		android,ramoops-ftrace-size = <0x10000>;
+		android,ramoops-pmsg-size = <0x20000>;
+		android,ramoops-dump-oops = <0x1>;
+		memory-region = <&ramoops_mem>;
 	};
 
 	sound-9335 {
