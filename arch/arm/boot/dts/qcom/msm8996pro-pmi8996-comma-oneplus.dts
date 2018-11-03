@@ -620,6 +620,14 @@
 		qcom,src-sel = <0>;
 		status = "okay";
 	};
+
+	gpio@c500 {
+		qcom,mode = <0>;
+		qcom,pull = <0>;
+		qcom,vin-sel = <2>;
+		qcom,src-sel = <0>;
+		status = "okay";
+	};
 };
 
 &soc {
@@ -797,6 +805,14 @@
 			pinctrl-0 = <&quat_mi2s_active &quat_mi2s_sd0_active &quat_mi2s_sd1_active>;
 			pinctrl-1 = <&quat_mi2s_sleep &quat_mi2s_sd0_sleep &quat_mi2s_sd1_sleep>;
 		};
+	};
+
+	tri_state_key {
+		compatible = "oneplus,tri-state-key";
+		interrupt-parent = <&tlmm>;
+		tristate,gpio_key2 = <&pm8994_gpios 4 0>;
+		tristate,gpio_key1 = <&pm8994_gpios 6 0>;
+		tristate,gpio_key3 = <&pm8994_gpios 5 0>;
 	};
 };
 
