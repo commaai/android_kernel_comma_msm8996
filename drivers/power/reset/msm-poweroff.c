@@ -25,6 +25,7 @@
 #include <linux/delay.h>
 #include <linux/qpnp/power-on.h>
 #include <linux/of_address.h>
+#include <linux/comma_board.h>
 
 #include <asm/cacheflush.h>
 #include <asm/system_misc.h>
@@ -301,9 +302,11 @@ static void msm_restart_prepare(const char *cmd)
 	}
 
 #ifdef CONFIG_MACH_COMMA
-	if (in_panic)
+	if (in_panic) {
+		if (comma_board_id() == COMMA_BOARD_ONEPLUS)
+			qpnp_pon_set_restart_reason(PON_RESTART_REASON_REBOOT);
 		__raw_writel(0x77665501, restart_reason);
-	else
+	} else
 #endif
 	if (cmd != NULL) {
 		if (!strncmp(cmd, "bootloader", 10)) {
@@ -340,6 +343,10 @@ static void msm_restart_prepare(const char *cmd)
 		} else if (!strncmp(cmd, "edl", 3)) {
 			enable_emergency_dload_mode();
 		} else {
+#ifdef CONFIG_MACH_COMMA
+			if (comma_board_id() == COMMA_BOARD_ONEPLUS)
+				qpnp_pon_set_restart_reason(PON_RESTART_REASON_REBOOT);
+#endif
 			__raw_writel(0x77665501, restart_reason);
 		}
 	}
