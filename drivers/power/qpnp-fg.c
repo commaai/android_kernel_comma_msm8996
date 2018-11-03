@@ -35,6 +35,7 @@
 #include <linux/string_helpers.h>
 #include <linux/alarmtimer.h>
 #include <linux/qpnp/qpnp-revid.h>
+#include <linux/comma_board.h>
 
 /* Register offsets */
 
@@ -611,6 +612,9 @@ struct fg_chip {
 	struct delayed_work	check_sanity_work;
 	struct fg_wakeup_source	sanity_wakeup_source;
 	u8			last_beat_count;
+#ifdef CONFIG_MACH_COMMA
+	struct power_supply	*bq_psy;
+#endif
 };
 
 /* FG_MEMIF DEBUGFS structures */
@@ -3221,12 +3225,52 @@ static enum power_supply_property fg_power_props[] = {
 	POWER_SUPPLY_PROP_HI_POWER,
 };
 
+#ifdef CONFIG_MACH_COMMA
+static bool is_oneplus_batt_available(struct fg_chip *chip)
+{
+	if (!chip->bq_psy)
+		chip->bq_psy = power_supply_get_by_name("bq27541");
+
+	if (!chip->bq_psy)
+		return false;
+
+	return true;
+}
+
+static int fg_get_oneplus_prop(struct fg_chip *chip,
+	enum power_supply_property psp, union power_supply_propval *val)
+{
+	if (!is_oneplus_batt_available(chip))
+		return -ENODEV;
+
+	switch (psp) {
+	case POWER_SUPPLY_PROP_CAPACITY:
+	case POWER_SUPPLY_PROP_CURRENT_NOW:
+	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
+	case POWER_SUPPLY_PROP_TEMP:
+		chip->bq_psy->get_property(chip->bq_psy, psp, val);
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	return 0;
+}
+#endif
+
 static int fg_power_get_property(struct power_supply *psy,
 				       enum power_supply_property psp,
 				       union power_supply_propval *val)
 {
 	struct fg_chip *chip = container_of(psy, struct fg_chip, bms_psy);
 	bool vbatt_low_sts;
+
+#ifdef CONFIG_MACH_COMMA
+	if (comma_board_id() == COMMA_BOARD_ONEPLUS) {
+		if (!fg_get_oneplus_prop(chip, psp, val))
+			return 0;
+	}
+#endif
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_BATTERY_TYPE:
