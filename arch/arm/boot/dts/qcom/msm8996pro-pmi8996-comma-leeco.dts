@@ -16,6 +16,7 @@
 #include "msm8996pro.dtsi"
 #include "msm-pmi8996.dtsi"
 #include "msm8996-mtp.dtsi"
+#include "msm8996-comma-common.dtsi"
 #include "dsi-panel-s6d6fa1-1080p-video.dtsi"
 
 / {
@@ -35,10 +36,6 @@
 			label = "ramoops_mem";
 		};
 	};
-};
-
-&adsp_mem {
-	size = <0 0x10000000>;
 };
 
 &tlmm {
@@ -444,11 +441,6 @@
 	qcom,init-voltage = <1200000>;
 };
 
-&msm_cpufreq {
-	qcom,cpufreq-table-0 = <1593600>;
-	qcom,cpufreq-table-2 = <1670400>;
-};
-
 &mtp_batterydata {
 	qcom,letv_zl1_lishen_4000mah {
 		qcom,battery-type = "letv_zl1_lishen";
@@ -628,10 +620,6 @@
 		qcom,switch-source = <&pmi8994_switch>;
 	};
 
-	qcom,cnss {
-		/delete-property/ qcom,wlan-ramdump-dynamic;
-	};
-
 	ramoops {
 		compatible = "ramoops";
 		status = "ok";
@@ -735,8 +723,4 @@
 			qcom,msm-mi2s-ext-mclk = <12288000>;
 		};
 	};
-};
-
-&usb3 {
-	/delete-property/ vbus_dwc3-supply;
 };

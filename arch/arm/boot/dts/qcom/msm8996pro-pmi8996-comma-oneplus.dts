@@ -16,6 +16,7 @@
 #include "msm8996pro.dtsi"
 #include "msm-pmi8996.dtsi"
 #include "msm8996-mtp.dtsi"
+#include "msm8996-comma-common.dtsi"
 #include "dsi-panel-samsung_s6e3fa3_1080p_cmd.dtsi"
 #include "dsi-panel-samsung_s6e3fa5_1080p_cmd.dtsi"
 #include "dsi-panel-samsung_s6e3fa5r9s_1080p_cmd.dtsi"
@@ -37,10 +38,6 @@
 			label = "ramoops_mem";
 		};
 	};
-};
-
-&adsp_mem {
-	size = <0 0x10000000>;
 };
 
 &pil_gpu {
@@ -612,11 +609,6 @@
 	};
 };
 
-&msm_cpufreq {
-	qcom,cpufreq-table-0 = <1593600>;
-	qcom,cpufreq-table-2 = <1670400>;
-};
-
 &pm8994_gpios {
 	gpio@c200 {
 		qcom,mode = <0>;
@@ -719,10 +711,6 @@
 		qcom,flash-source = <&pmi8994_flash0 &pmi8994_flash1>;
 		qcom,torch-source = <&pmi8994_torch0 &pmi8994_torch1>;
 		qcom,switch-source = <&pmi8994_switch>;
-	};
-
-	qcom,cnss {
-		/delete-property/ qcom,wlan-ramdump-dynamic;
 	};
 
 	ramoops {
@@ -828,8 +816,4 @@
 			/delete-node/ qcom,pon_3;
 		};
 	};
-};
-
-&usb3 {
-	/delete-property/ vbus_dwc3-supply;
 };
