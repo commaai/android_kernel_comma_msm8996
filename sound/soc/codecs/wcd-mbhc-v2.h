@@ -321,7 +321,9 @@ do {                                                    \
 		mbhc->wcd_mbhc_regs[function].reg)) &	\
 		(mbhc->wcd_mbhc_regs[function].mask)) >> \
 		(mbhc->wcd_mbhc_regs[function].offset)); \
-	}                                               \
+	} else {					\
+		val = 0;				\
+	}						\
 } while (0)
 
 struct wcd_mbhc_cb {

@@ -1410,23 +1410,14 @@ int dbglog_report_enable(wmi_unified_t  wmi_handle, bool isenable)
 {
     int bitmap[2] = {0};
 
-    if (isenable > TRUE) {
+    if (isenable) {
         AR_DEBUG_PRINTF(ATH_DEBUG_ERR, ("dbglog_report_enable:Invalid value %d\n",
         isenable));
         return -EINVAL;
     }
 
-    if(isenable){
-	/* set the vap enable bitmap */
-        dbglog_set_vap_enable_bitmap(wmi_handle, 0xFFFF);
-	bitmap[0] = 0xFFFFFFFF;
-	bitmap[1] = 0x1F;
-	/* set the module level bitmap  */
-	dbglog_set_mod_enable_bitmap(wmi_handle, 0x0, bitmap, 2);
-    } else {
-        dbglog_set_vap_enable_bitmap(wmi_handle, bitmap[0]);
-        dbglog_set_mod_enable_bitmap(wmi_handle, DBGLOG_LVL_MAX, bitmap, 2);
-    }
+    dbglog_set_vap_enable_bitmap(wmi_handle, bitmap[0]);
+    dbglog_set_mod_enable_bitmap(wmi_handle, DBGLOG_LVL_MAX, bitmap, 2);
     return 0;
 }
 

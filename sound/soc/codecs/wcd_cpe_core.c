@@ -2910,7 +2910,7 @@ static int wcd_cpe_send_param_snd_model(struct wcd_cpe_core *core,
 	struct cpe_lsm_session *session, struct cpe_lsm_ids *ids)
 {
 	int ret = 0;
-	struct cmi_obm_msg obm_msg;
+	struct cmi_obm_msg obm_msg = {};
 	struct cpe_param_data *param_d;
 
 
@@ -4082,7 +4082,7 @@ static int wcd_cpe_send_afe_cal(void *core_handle,
 
 	struct cal_block_data *afe_cal = NULL;
 	struct wcd_cpe_core *core = core_handle;
-	struct cmi_obm_msg obm_msg;
+	struct cmi_obm_msg obm_msg = {};
 	void *inb_msg = NULL;
 	void *msg;
 	int rc = 0;

@@ -2818,6 +2818,7 @@ struct cpu_pwr_stats __weak *get_cpu_pwr_stats(void)
  */
 unsigned int power_cost(int cpu, u64 demand)
 {
+#ifdef CONFIG_SCHED_FREQ_INPUT
 	int first, mid, last;
 	struct cpu_pwr_stats *per_cpu_info = get_cpu_pwr_stats();
 	struct cpu_pstate_pwr *costs;
@@ -2879,7 +2880,9 @@ unlock:
 	}
 
 	return pc + total_static_pwr_cost;
-
+#else
+	return cpu_max_possible_capacity(cpu);
+#endif
 }
 
 struct cpu_select_env {

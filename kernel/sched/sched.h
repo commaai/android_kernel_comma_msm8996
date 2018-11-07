@@ -38,7 +38,9 @@ struct freq_max_load {
 	struct freq_max_load_entry freqs[0];
 };
 
+#ifdef CONFIG_SCHED_FREQ_INPUT
 extern DEFINE_PER_CPU(struct freq_max_load *, freq_max_load);
+#endif
 
 extern long calc_load_fold_active(struct rq *this_rq);
 extern void update_cpu_load_active(struct rq *this_rq);

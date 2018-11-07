@@ -1623,10 +1623,10 @@ void sapComputeSpectWeight( tSapChSelSpectInfo* pSpectInfoParams,
                     /* channelWidth == 2, VHT80*/
                     switch(pSpectCh->channelWidth)
                     {
-                        case eHT_CHANNEL_WIDTH_40MHZ: //HT40
+                        case eHT_CHANNEL_WIDTH_40MHZ: { //HT40
+                            tSapSpectChInfo *pExtSpectCh = NULL;
                             switch( secondaryChannelOffset)
                             {
-                                tSapSpectChInfo *pExtSpectCh = NULL;
                                 case PHY_DOUBLE_CHANNEL_LOW_PRIMARY: // Above the Primary Channel
                                     pExtSpectCh = (pSpectCh + 1);
                                     if( pExtSpectCh != NULL &&
@@ -1662,6 +1662,7 @@ void sapComputeSpectWeight( tSapChSelSpectInfo* pSpectInfoParams,
                                     }
                                 break;
                             }
+                        }
                         break;
                         case eHT_CHANNEL_WIDTH_80MHZ: // VHT80
                             if((centerFreq - channel_id) == 6)

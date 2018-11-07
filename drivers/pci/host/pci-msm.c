@@ -4926,9 +4926,6 @@ static irqreturn_t handle_global_irq(int irq, void *data)
 	unsigned long irqsave_flags;
 	u32 status;
 
-	PCIE_DBG2(dev, "RC%d: Global IRQ %d received: 0x%x\n",
-		dev->rc_idx, irq, status);
-
 	spin_lock_irqsave(&dev->global_irq_lock, irqsave_flags);
 
 	status = readl_relaxed(dev->parf + PCIE20_PARF_INT_ALL_STATUS);
@@ -4964,6 +4961,9 @@ static irqreturn_t handle_global_irq(int irq, void *data)
 	}
 
 	spin_unlock_irqrestore(&dev->global_irq_lock, irqsave_flags);
+
+	PCIE_DBG2(dev, "RC%d: Global IRQ %d received: 0x%x\n",
+		dev->rc_idx, irq, status);
 
 	return IRQ_HANDLED;
 }

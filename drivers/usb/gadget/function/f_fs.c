@@ -1698,9 +1698,11 @@ static int ffs_epfiles_create(struct ffs_data *ffs)
 		init_waitqueue_head(&epfile->wait);
 		atomic_set(&epfile->opened, 0);
 		if (ffs->user_flags & FUNCTIONFS_VIRTUAL_ADDR)
-			sprintf(epfiles->name, "ep%02x", ffs->eps_addrmap[i]);
+			snprintf(epfiles->name, sizeof(epfiles->name),
+				"ep%02x", ffs->eps_addrmap[i]);
 		else
-			sprintf(epfiles->name, "ep%u", i);
+			snprintf(epfiles->name, sizeof(epfiles->name),
+				"ep%u", i);
 		epfile->dentry = ffs_sb_create_file(ffs->sb, epfiles->name,
 						 epfile,
 						 &ffs_epfile_operations);

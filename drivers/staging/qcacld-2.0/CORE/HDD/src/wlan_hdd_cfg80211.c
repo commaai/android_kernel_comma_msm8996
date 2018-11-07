@@ -15679,12 +15679,12 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
                                           request);
     if (status <= 0)
     {
-      if (!status)
-          hddLog(VOS_TRACE_LEVEL_ERROR, "%s: TDLS in progress.scan rejected %d",
-                 __func__, status);
-      else
-          hddLog(VOS_TRACE_LEVEL_ERROR, "%s: TDLS teardown is ongoing %d",
-                 __func__, status);
+        if (!status)
+            hddLog(VOS_TRACE_LEVEL_ERROR, "%s: TDLS in progress.scan rejected %d",
+                   __func__, status);
+        else
+            hddLog(VOS_TRACE_LEVEL_ERROR, "%s: TDLS teardown is ongoing %d",
+                   __func__, status);
 
         return status;
     }

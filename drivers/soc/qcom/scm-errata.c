@@ -134,11 +134,13 @@ static int __init scm_errata_init(void)
 	if (!debugfs_base)
 		return -ENOMEM;
 
-	if (!debugfs_create_file("kryo_e74_e75", S_IRUGO | S_IWUSR,
-			debugfs_base, NULL, &kryo_e74_e75_fops))
+	ret = PTR_ERR(debugfs_create_file("kryo_e74_e75", S_IRUGO | S_IWUSR,
+			debugfs_base, NULL, &kryo_e74_e75_fops));
+	if (ret)
 		goto err;
-	if (!debugfs_create_file("kryo_e76", S_IRUGO | S_IWUSR,
-			debugfs_base, NULL, &kryo_e76_fops))
+	ret = PTR_ERR(debugfs_create_file("kryo_e76", S_IRUGO | S_IWUSR,
+			debugfs_base, NULL, &kryo_e76_fops));
+	if (ret)
 		goto err;
 	ret = register_hotcpu_notifier(&scm_errata_notifier);
 	if (ret)

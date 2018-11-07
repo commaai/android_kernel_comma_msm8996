@@ -813,8 +813,10 @@ static int xhci_ehset_single_step_set_feature(struct usb_hcd *hcd, int port)
 	dr->wIndex = 0;
 	dr->wLength = cpu_to_le16(USB_DT_DEVICE_SIZE);
 	urb = xhci_request_single_step_set_feature_urb(udev, dr, buf, &done);
-	if (!urb)
+	if (!urb) {
+		retval = -ENOTCONN;
 		goto cleanup;
+	}
 
 	/* Now complete just the SETUP stage */
 	spin_lock_irqsave(&xhci->lock, flags);

@@ -3905,7 +3905,7 @@ static int tasha_codec_enable_lineout_pa(struct snd_soc_dapm_widget *w,
 					 int event)
 {
 	struct snd_soc_codec *codec = w->codec;
-	u16 lineout_vol_reg, lineout_mix_vol_reg;
+	u16 lineout_vol_reg = 0, lineout_mix_vol_reg = 0;
 	int ret = 0;
 
 	dev_dbg(codec->dev, "%s %s %d\n", __func__, w->name, event);
@@ -3926,7 +3926,9 @@ static int tasha_codec_enable_lineout_pa(struct snd_soc_dapm_widget *w,
 			lineout_vol_reg = WCD9335_CDC_RX6_RX_PATH_CTL;
 			lineout_mix_vol_reg = WCD9335_CDC_RX6_RX_PATH_MIX_CTL;
 		}
-	} else {
+	}
+
+	if (!lineout_mix_vol_reg || !lineout_vol_reg) {
 		dev_err(codec->dev, "%s: Error enabling lineout PA\n",
 			__func__);
 		return -EINVAL;
@@ -4402,6 +4404,10 @@ static int tasha_codec_spk_boost_event(struct snd_soc_dapm_widget *w,
 		boost_path_cfg1 = WCD9335_CDC_RX8_RX_PATH_CFG1;
 		reg = WCD9335_CDC_RX8_RX_PATH_CTL;
 		reg_mix = WCD9335_CDC_RX8_RX_PATH_MIX_CTL;
+	} else {
+		dev_err(codec->dev, "%s: Invalid name: %s\n",
+						__func__, w->name);
+		return -EINVAL;
 	}
 
 	switch (event) {
@@ -4423,7 +4429,7 @@ static int tasha_codec_spk_boost_event(struct snd_soc_dapm_widget *w,
 
 static u16 tasha_interp_get_primary_reg(u16 reg, u16 *ind)
 {
-	u16 prim_int_reg;
+	u16 prim_int_reg = 0;
 
 	switch (reg) {
 	case WCD9335_CDC_RX0_RX_PATH_CTL:
@@ -4471,6 +4477,8 @@ static u16 tasha_interp_get_primary_reg(u16 reg, u16 *ind)
 		prim_int_reg = WCD9335_CDC_RX8_RX_PATH_CTL;
 		*ind = 8;
 		break;
+	default: /* This should never happen */
+		pr_err("%s: Unknown reg: %u\n", __func__, reg);
 	};
 
 	return prim_int_reg;
@@ -4514,7 +4522,7 @@ static int tasha_codec_enable_prim_interpolator(
 {
 	struct tasha_priv *tasha = snd_soc_codec_get_drvdata(codec);
 	u16 prim_int_reg;
-	u16 ind;
+	u16 ind = 0;
 
 	prim_int_reg = tasha_interp_get_primary_reg(reg, &ind);
 
@@ -4621,6 +4629,9 @@ static int tasha_codec_enable_spline_src(struct snd_soc_codec *codec,
 		rx_path_ctl_reg = WCD9335_CDC_RX6_RX_PATH_CTL;
 		spl_src = SPLINE_SRC3;
 		break;
+	default:
+		pr_err("%s: Invalid src_num: %d\n", __func__, src_num);
+		return -EINVAL;
 	};
 
 	src_users = &tasha->spl_src_users[spl_src];
@@ -4713,7 +4724,9 @@ static int tasha_codec_enable_swr(struct snd_soc_dapm_widget *w,
 {
 	struct snd_soc_codec *codec = w->codec;
 	struct tasha_priv *tasha;
+#ifdef WSA881X_PA
 	int i, ch_cnt;
+#endif
 
 	tasha = snd_soc_codec_get_drvdata(codec);
 
@@ -4728,6 +4741,8 @@ static int tasha_codec_enable_swr(struct snd_soc_dapm_widget *w,
 		if ((strnstr(w->name, "INT8_", sizeof("RX INT8_"))) &&
 		    !tasha->rx_8_count)
 			tasha->rx_8_count++;
+
+#ifdef WSA881X_PA
 		ch_cnt = tasha->rx_7_count + tasha->rx_8_count;
 
 		for (i = 0; i < tasha->nr; i++) {
@@ -4736,6 +4751,7 @@ static int tasha_codec_enable_swr(struct snd_soc_dapm_widget *w,
 			swrm_wcd_notify(tasha->swr_ctrl_data[i].swr_pdev,
 					SWR_SET_NUM_RX_CH, &ch_cnt);
 		}
+#endif
 		break;
 	case SND_SOC_DAPM_POST_PMD:
 		if ((strnstr(w->name, "INT7_", sizeof("RX INT7_"))) &&
@@ -4744,12 +4760,13 @@ static int tasha_codec_enable_swr(struct snd_soc_dapm_widget *w,
 		if ((strnstr(w->name, "INT8_", sizeof("RX INT8_"))) &&
 		    tasha->rx_8_count)
 			tasha->rx_8_count--;
+#ifdef WSA881X_PA
 		ch_cnt = tasha->rx_7_count + tasha->rx_8_count;
 
 		for (i = 0; i < tasha->nr; i++)
 			swrm_wcd_notify(tasha->swr_ctrl_data[i].swr_pdev,
 					SWR_SET_NUM_RX_CH, &ch_cnt);
-
+#endif
 		break;
 	}
 	dev_dbg(tasha->dev, "%s: current swr ch cnt: %d\n",
@@ -5781,6 +5798,9 @@ static int tasha_codec_force_enable_micbias(struct snd_soc_dapm_widget *w,
 		ret = __tasha_codec_enable_micbias(w, SND_SOC_DAPM_POST_PMD);
 		wcd_resmgr_disable_master_bias(tasha->resmgr);
 		break;
+	default:
+		pr_err("%s: Invalid event: %d\n", __func__, event);
+		ret = -EINVAL;
 	}
 
 	return ret;
@@ -7879,6 +7899,11 @@ static int tasha_codec_vbat_enable_event(struct snd_soc_dapm_widget *w,
 		vbat_path_cfg = WCD9335_CDC_RX6_RX_PATH_CFG1;
 	else if (!strcmp(w->name, "RX INT5 VBAT"))
 		vbat_path_cfg = WCD9335_CDC_RX5_RX_PATH_CFG1;
+	else {
+		dev_err(codec->dev, "%s: Invalid name: %s\n",
+				__func__, w->name);
+		return -EINVAL;
+	}
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
@@ -8234,6 +8259,11 @@ static int tasha_int_dem_inp_mux_put(struct snd_kcontrol *kcontrol,
 		look_ahead_dly_reg = WCD9335_CDC_RX1_RX_PATH_CFG0;
 	else if (e->reg == WCD9335_CDC_RX2_RX_PATH_SEC0)
 		look_ahead_dly_reg = WCD9335_CDC_RX2_RX_PATH_CFG0;
+	else {
+		dev_err(codec->dev, "%s: Invalid reg: 0x%x\n",
+						__func__, e->reg);
+		return -EINVAL;
+	}
 
 	/* Set Look Ahead Delay */
 	snd_soc_update_bits(codec, look_ahead_dly_reg,
@@ -10613,9 +10643,9 @@ static int tasha_set_decimator_rate(struct snd_soc_dai *dai,
 	struct wcd9xxx_ch *ch;
 	struct tasha_priv *tasha = snd_soc_codec_get_drvdata(codec);
 	u32 tx_port;
-	u8 shift, shift_val, tx_mux_sel;
+	u8 shift = 0, shift_val = 0, tx_mux_sel;
 	int decimator = -1;
-	u16 tx_port_reg, tx_fs_reg;
+	u16 tx_port_reg = 0, tx_fs_reg;
 
 	list_for_each_entry(ch, &tasha->dai[dai->id].wcd9xxx_ch_list, list) {
 		tx_port = ch->port;
@@ -10882,6 +10912,10 @@ static int tasha_hw_params(struct snd_pcm_substream *substream,
 			tasha->dai[dai->id].bit_width = 24;
 			i2s_bit_mode = 0x00;
 			break;
+		default:
+			dev_err(tasha->dev, "%s: %d: Invalid format 0x%x\n",
+				__func__, __LINE__, params_width(params));
+			return -EINVAL;
 		}
 		tasha->dai[dai->id].rate = params_rate(params);
 		if (tasha->intf_type == WCD9XXX_INTERFACE_TYPE_I2C) {
@@ -11466,7 +11500,7 @@ static ssize_t tasha_codec_version_read(struct snd_info_entry *entry,
 	struct tasha_priv *tasha;
 	struct wcd9xxx *wcd9xxx;
 	char buffer[TASHA_VERSION_ENTRY_SIZE];
-	int len;
+	int len = 0;
 
 	tasha = (struct tasha_priv *) entry->private_data;
 	if (!tasha) {
@@ -12593,14 +12627,18 @@ static int tasha_device_down(struct wcd9xxx *wcd9xxx)
 	struct snd_soc_codec *codec;
 	struct tasha_priv *priv;
 	int count;
+#ifdef WSA881X_PA
 	int i = 0;
+#endif
 
 	codec = (struct snd_soc_codec *)(wcd9xxx->ssr_priv);
 	priv = snd_soc_codec_get_drvdata(codec);
 	wcd_cpe_ssr_event(priv->cpe_core, WCD_CPE_BUS_DOWN_EVENT);
+#ifdef WSA881X_PA
 	for (i = 0; i < priv->nr; i++)
 		swrm_wcd_notify(priv->swr_ctrl_data[i].swr_pdev,
 				SWR_DEVICE_DOWN, NULL);
+#endif
 	snd_soc_card_change_online_state(codec->component.card, 0);
 	for (count = 0; count < NUM_CODEC_DAIS; count++)
 		priv->dai[count].bus_down_in_recovery = true;

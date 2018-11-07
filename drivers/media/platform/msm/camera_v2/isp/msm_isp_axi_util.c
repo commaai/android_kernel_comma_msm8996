@@ -1701,7 +1701,8 @@ static int msm_isp_cfg_ping_pong_address(struct vfe_device *vfe_dev,
 
 		if (dual_vfe_res) {
 			for (vfe_id = 0; vfe_id < MAX_VFE; vfe_id++) {
-				if (vfe_id != vfe_dev->pdev->id)
+				bool use_lock = vfe_id != vfe_dev->pdev->id;
+				if (use_lock)
 					spin_lock_irqsave(
 						&dual_vfe_res->
 						axi_data[vfe_id]->
@@ -1733,7 +1734,7 @@ static int msm_isp_cfg_ping_pong_address(struct vfe_device *vfe_dev,
 						buf[!pingpong_bit] =
 						buf;
 				}
-				if (vfe_id != vfe_dev->pdev->id)
+				if (use_lock)
 					spin_unlock_irqrestore(
 						&dual_vfe_res->
 						axi_data[vfe_id]->

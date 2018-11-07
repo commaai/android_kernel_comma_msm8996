@@ -5283,7 +5283,7 @@ tSirRetStatus limSendAddBARsp( tpAniSirGlobal pMac,
     //Pkt will be freed up by the callback
     return statusCode;
    }
-   else
+
       return eSIR_SUCCESS;
 
       returnAfterError:
@@ -5466,7 +5466,7 @@ tSirRetStatus limSendDelBAInd( tpAniSirGlobal pMac,
        //Pkt will be freed up by the callback
        return statusCode;
     }
-    else
+
       return eSIR_SUCCESS;
 
       returnAfterError:

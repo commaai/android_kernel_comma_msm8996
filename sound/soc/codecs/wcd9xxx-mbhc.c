@@ -401,10 +401,10 @@ static bool __wcd9xxx_switch_micbias(struct wcd9xxx_mbhc *mbhc,
 		    restartpolling)
 			wcd9xxx_pause_hs_polling(mbhc);
 
-			snd_soc_update_bits(codec, WCD9XXX_A_MAD_ANA_CTRL,
-					    0x10, 0x10);
-			snd_soc_update_bits(codec, WCD9XXX_A_LDO_H_MODE_1,
-					    0x20, 0x20);
+		snd_soc_update_bits(codec, WCD9XXX_A_MAD_ANA_CTRL,
+				    0x10, 0x10);
+		snd_soc_update_bits(codec, WCD9XXX_A_LDO_H_MODE_1,
+				    0x20, 0x20);
 		/* Reprogram thresholds */
 		if (d->micb_mv != VDDIO_MICBIAS_MV) {
 			cfilt_k_val =
@@ -4598,8 +4598,7 @@ int wcd9xxx_mbhc_set_keycode(struct wcd9xxx_mbhc *mbhc)
 				break;
 			default:
 				WARN_ONCE(1, "Wrong button number:%d\n", i);
-				result = -1;
-				break;
+				return -1;
 			}
 			ret = snd_jack_set_key(mbhc->button_jack.jack,
 					       type,
@@ -5334,15 +5333,13 @@ static int wcd9xxx_detect_impedance(struct wcd9xxx_mbhc *mbhc, uint32_t *zl,
 	if (mbhc->mbhc_cb->get_cdc_type &&
 	     mbhc->mbhc_cb->get_cdc_type() == WCD9XXX_CDC_TYPE_TOMTOM) {
 		uint32_t zl_t = 0, zr_t = 0;
-		s16 *l_p, *r_p;
+		s16 *l_p = NULL, *r_p = NULL;
 		enum mbhc_zdet_zones zdet_zone;
 		int32_t gain;
 
 		zdet_zone = wcd9xxx_assign_zdet_zone(*zl, *zr, &gain);
 		switch (zdet_zone) {
 		case ZL_ZONE1__ZR_ZONE1:
-			l_p = NULL;
-			r_p = NULL;
 			break;
 		case ZL_ZONE2__ZR_ZONE2:
 		case ZL_ZONE3__ZR_ZONE3:

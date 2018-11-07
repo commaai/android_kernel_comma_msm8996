@@ -4690,14 +4690,14 @@ int mdss_mdp_get_pipe_flush_bits(struct mdss_mdp_pipe *pipe)
 	u32 flush_bits;
 
 	if (pipe->type == MDSS_MDP_PIPE_TYPE_DMA)
-		flush_bits |= BIT(pipe->num) << 5;
+		flush_bits = BIT(pipe->num) << 5;
 	else if (pipe->num == MDSS_MDP_SSPP_VIG3 ||
 			pipe->num == MDSS_MDP_SSPP_RGB3)
-		flush_bits |= BIT(pipe->num) << 10;
+		flush_bits = BIT(pipe->num) << 10;
 	else if (pipe->type == MDSS_MDP_PIPE_TYPE_CURSOR)
-		flush_bits |= BIT(22 + pipe->num - MDSS_MDP_SSPP_CURSOR0);
+		flush_bits = BIT(22 + pipe->num - MDSS_MDP_SSPP_CURSOR0);
 	else /* RGB/VIG 0-2 pipes */
-		flush_bits |= BIT(pipe->num);
+		flush_bits = BIT(pipe->num);
 
 	return flush_bits;
 }

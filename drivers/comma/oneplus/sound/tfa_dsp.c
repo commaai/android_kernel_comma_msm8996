@@ -808,7 +808,7 @@ static int tfa98xx_is87(struct tfa98xx *tfa98xx)
 static int tfa98xx_init(struct tfa98xx *tfa98xx)
 {
 	struct snd_soc_codec *codec = tfa98xx->codec;
-	int ret;
+	int ret = 0;
 
 	pr_debug("Reset all i2c registers\n");
 

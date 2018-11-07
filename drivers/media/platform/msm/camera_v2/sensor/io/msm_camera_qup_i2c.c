@@ -456,13 +456,13 @@ int32_t msm_camera_qup_i2c_poll(struct msm_camera_i2c_client *client,
 		if (rc < 0) {
 			pr_err("%s:%d qup_i2c_compare failed rc = %d", __func__,
 				__LINE__, rc);
-			break;
+			return rc;
 		}
 		if (rc == I2C_COMPARE_MISMATCH)
 			break;
 		usleep_range(1000, 1010);
 	}
-	return rc;
+	return 0;
 }
 
 static int32_t msm_camera_qup_i2c_set_mask(struct msm_camera_i2c_client *client,
