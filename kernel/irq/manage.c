@@ -18,6 +18,7 @@
 #include <linux/sched.h>
 #include <linux/sched/rt.h>
 #include <linux/task_work.h>
+#include <linux/comma_irq_balance.h>
 
 #include "internals.h"
 
@@ -1256,6 +1257,10 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 	new->dir = NULL;
 	register_handler_proc(irq, new);
 	free_cpumask_var(mask);
+
+#ifdef CONFIG_MACH_COMMA
+	comma_balance_irq(irq);
+#endif
 
 	return 0;
 
