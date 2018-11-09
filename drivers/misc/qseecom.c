@@ -1897,7 +1897,10 @@ static int __qseecom_reentrancy_process_incomplete_cmd(
 	size_t cmd_len;
 	struct sglist_info *table = NULL;
 
-	while (resp->result == QSEOS_RESULT_INCOMPLETE) {
+	if (resp->result != QSEOS_RESULT_INCOMPLETE)
+		return 0;
+
+	do {
 		lstnr = resp->data;
 		/*
 		 * Wake up blocking lsitener service with the lstnr id
@@ -2038,7 +2041,7 @@ static int __qseecom_reentrancy_process_incomplete_cmd(
 			goto exit;
 		}
 
-	}
+	} while (resp->result == QSEOS_RESULT_INCOMPLETE);
 exit:
 	if (lstnr == RPMB_SERVICE)
 		__qseecom_disable_clk(CLK_QSEE);
