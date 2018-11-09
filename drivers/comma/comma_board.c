@@ -36,4 +36,4 @@ static int __init comma_board_init(void)
 
 	return 0;
 }
-core_initcall(comma_board_init);
+early_initcall(comma_board_init);
