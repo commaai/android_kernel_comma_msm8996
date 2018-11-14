@@ -135,7 +135,6 @@
 				pins = "gpio125";
 				bias-pull-up;
 				drive-strength = <16>;
-				input-low;
 			};
 		};
 
@@ -148,9 +147,7 @@
 			config {
 				pins = "gpio125";
 				bias-disable;
-				bias-pull-down;
 				drive-strength = <2>;
-				input-high;
 			};
 		};
 	};
@@ -179,7 +176,6 @@
 			config {
 				pins = "gpio89";
 				bias-disable;
-				bias-pull-down;
 				drive-strength = <2>;
 				output-high;
 			};
@@ -441,6 +437,11 @@
 	qcom,init-voltage = <1200000>;
 };
 
+&mdss_dsi0 {
+	qcom,platform-te-gpio = <&tlmm 97 0>;
+	qcom,platform-reset-gpio = <&tlmm 24 0>;
+};
+
 &mtp_batterydata {
 	qcom,letv_zl1_lishen_4000mah {
 		qcom,battery-type = "letv_zl1_lishen";
@@ -531,7 +532,6 @@
 			 00 00 00 0C
 		];
 	};
-
 };
 
 &soc {
@@ -634,11 +634,6 @@
 	};
 
 	sound-9335 {
-		/delete-property/ qcom,hph-en1-gpio;
-		/delete-property/ qcom,hph-en0-gpio;
-		/delete-property/ qcom,wsa-devs;
-		/delete-property/ qcom,wsa-aux-dev-prefix;
-
 		qcom,audio-routing =
 			"AIF4 VI", "MCLK",
 			"RX_BIAS", "MCLK",

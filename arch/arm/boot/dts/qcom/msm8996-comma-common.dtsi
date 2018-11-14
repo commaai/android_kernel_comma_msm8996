@@ -15,17 +15,65 @@
 	size = <0 0x10000000>;
 };
 
+&mdss_dsi0 {
+	/delete-property/ qcom,platform-bklight-en-gpio;
+};
+
+&mdss_dsi1 {
+	status = "disabled";
+};
+
+&mdss_fb1 {
+	status = "disabled";
+};
+
+&mdss_fb2 {
+	status = "disabled";
+};
+
+&mdss_fb3 {
+	status = "disabled";
+};
+
 &msm_cpufreq {
 	qcom,cpufreq-table-0 = <1593600>;
 	qcom,cpufreq-table-2 = <1670400>;
 };
 
+&pcie1 {
+	status = "disabled";
+};
+
+&pcie2 {
+	status = "disabled";
+};
+
 &soc {
+	/delete-node/ gen-vkeys;
+
+	gpio_keys {
+		/delete-node/ cam_focus;
+		/delete-node/ cam_snapshot;
+	};
+
 	qcom,cnss {
 		/delete-property/ qcom,wlan-ramdump-dynamic;
+	};
+
+	sound-9335 {
+		/delete-property/ qcom,hph-en0-gpio;
+		/delete-property/ qcom,hph-en1-gpio;
+		/delete-property/ qcom,us-euro-gpios;
+		/delete-property/ qcom,wsa-aux-dev-prefix;
+		/delete-property/ qcom,wsa-devs;
+		/delete-property/ qcom,wsa-max-devs;
 	};
 };
 
 &usb3 {
 	/delete-property/ vbus_dwc3-supply;
+};
+
+&usb_otg_switch {
+	status = "disabled";
 };

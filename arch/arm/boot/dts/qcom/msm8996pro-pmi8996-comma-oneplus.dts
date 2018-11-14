@@ -629,8 +629,6 @@
 
 &soc {
 	gpio_keys {
-		/delete-node/ cam_focus;
-		/delete-node/ cam_snapshot;
 		/delete-node/ vol_up;
 
 		vol_up {
@@ -727,11 +725,6 @@
 	};
 
 	sound-9335 {
-		/delete-property/ qcom,hph-en1-gpio;
-		/delete-property/ qcom,hph-en0-gpio;
-		/delete-property/ qcom,wsa-devs;
-		/delete-property/ qcom,wsa-aux-dev-prefix;
-
 		qcom,msm-mbhc-hphl-swh = <1>;
 		qcom,msm-mbhc-gnd-swh = <1>;
 		qcom,audio-routing =
