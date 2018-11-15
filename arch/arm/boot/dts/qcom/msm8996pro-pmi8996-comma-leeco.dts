@@ -534,6 +534,11 @@
 	};
 };
 
+&pmi8994_wled {
+	qcom,fs-curr-ua = <20000>;
+	qcom,led-strings-list = [00 01];
+};
+
 &soc {
 	i2c_9: i2c@75b7000 {
 		compatible = "qcom,i2c-msm-v2";
