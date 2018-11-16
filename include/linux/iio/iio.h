@@ -37,6 +37,9 @@ enum iio_chan_info_enum {
 	IIO_CHAN_INFO_HARDWAREGAIN,
 	IIO_CHAN_INFO_HYSTERESIS,
 	IIO_CHAN_INFO_INT_TIME,
+#ifdef CONFIG_MACH_COMMA
+	IIO_CHAN_INFO_OVERSAMPLING_RATIO,
+#endif
 };
 
 enum iio_shared_by {
