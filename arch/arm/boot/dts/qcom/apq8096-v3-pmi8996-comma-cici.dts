@@ -25,3 +25,7 @@
 			<246 0x30001>, <291 0x30001>;
 	qcom,board-id = <10 28>;
 };
+
+&pmi8994_charger {
+	status = "disabled";
+};
