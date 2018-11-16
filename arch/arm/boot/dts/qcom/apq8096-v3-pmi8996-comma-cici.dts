@@ -33,6 +33,11 @@
 		interrupt-parent = <&tlmm>;
 		interrupts = <117 IRQ_TYPE_EDGE_RISING>;
 	};
+
+	bosch280@76 {
+		compatible = "bosch,bmp280";
+		reg = <0x76>;
+	};
 };
 
 &pm8994_lvs2 {
