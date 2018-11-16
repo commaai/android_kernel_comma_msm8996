@@ -30,6 +30,16 @@ enum iio_chan_type {
 	IIO_CCT,
 	IIO_PRESSURE,
 	IIO_HUMIDITYRELATIVE,
+#ifdef CONFIG_MACH_COMMA
+	IIO_SIGN_MOTION,
+	IIO_STEP_DETECTOR,
+	IIO_STEP_COUNTER,
+	IIO_TILT,
+	IIO_TAP,
+	IIO_TAP_TAP,
+	IIO_WRIST_TILT_GESTURE,
+	IIO_GESTURE,
+#endif
 };
 
 enum iio_modifier {
@@ -68,6 +78,9 @@ enum iio_event_type {
 	IIO_EV_TYPE_ROC,
 	IIO_EV_TYPE_THRESH_ADAPTIVE,
 	IIO_EV_TYPE_MAG_ADAPTIVE,
+#ifdef CONFIG_MACH_COMMA
+	IIO_EV_TYPE_FIFO_FLUSH,
+#endif
 };
 
 enum iio_event_info {
@@ -81,6 +94,10 @@ enum iio_event_direction {
 	IIO_EV_DIR_EITHER,
 	IIO_EV_DIR_RISING,
 	IIO_EV_DIR_FALLING,
+#ifdef CONFIG_MACH_COMMA
+	IIO_EV_DIR_FIFO_EMPTY,
+	IIO_EV_DIR_FIFO_DATA,
+#endif
 };
 
 #define IIO_VAL_INT 1

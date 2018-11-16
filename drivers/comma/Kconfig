@@ -1,2 +1,3 @@
 config MACH_COMMA
         bool "Enable Support for Comma boards"
+	select IIO_TRIGGERED_BUFFER
