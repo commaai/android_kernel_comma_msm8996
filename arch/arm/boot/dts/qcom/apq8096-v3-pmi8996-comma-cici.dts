@@ -26,6 +26,19 @@
 	qcom,board-id = <10 28>;
 };
 
+&i2c_6 {
+	lsm6ds3@6a {
+		compatible = "st,lsm6ds3";
+		reg = <0x6a>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <117 IRQ_TYPE_EDGE_RISING>;
+	};
+};
+
+&pm8994_lvs2 {
+	regulator-always-on;
+};
+
 &pmi8994_charger {
 	status = "disabled";
 };
