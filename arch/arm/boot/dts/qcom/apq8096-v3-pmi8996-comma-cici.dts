@@ -27,6 +27,14 @@
 };
 
 &i2c_6 {
+	memsic@30 {
+		compatible = "memsic,mmc3416x";
+		reg = <0x30>;
+		vdd-supply = <&pm8994_lvs2>;
+		vio-supply = <&pm8994_lvs2>;
+		memsic,dir = "obverse-x-axis-forward";
+	};
+
 	lsm6ds3@6a {
 		compatible = "st,lsm6ds3";
 		reg = <0x6a>;
