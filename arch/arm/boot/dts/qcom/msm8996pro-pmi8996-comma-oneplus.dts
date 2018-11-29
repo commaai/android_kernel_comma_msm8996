@@ -25,6 +25,7 @@
 	model = "Qualcomm Technologies, Inc. MSM 8996pro + PMI8996 MTP";
 	compatible = "qcom,msm8996-mtp", "qcom,msm8996", "qcom,mtp";
 	qcom,board-id = <8 0 15811 26>, <8 0 15811 27>, <8 0 15811 28>;
+	comma,board-name = "oneplus";
 
 	aliases {
 		i2c3 = &i2c_3;

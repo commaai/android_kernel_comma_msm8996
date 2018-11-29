@@ -24,6 +24,7 @@
 	qcom,msm-id = <246 0x30000>, <291 0x30000>,
 			<246 0x30001>, <291 0x30001>;
 	qcom,board-id = <10 28>;
+	comma,board-name = "cici";
 };
 
 &i2c_6 {

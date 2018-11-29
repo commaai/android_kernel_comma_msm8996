@@ -23,6 +23,7 @@
 	model = "Letv Technologies, Inc. MSM 8996pro + PMI8996 LE_ZL1";
 	compatible = "qcom,msm8996-mtp", "qcom,msm8996", "qcom,mtp";
 	qcom,board-id = <8 0xA1>, <8 0xA2>, <8 0xA4>, <8 0xA5>;
+	comma,board-name = "leeco";
 
 	aliases {
 		i2c9 = &i2c_9;
