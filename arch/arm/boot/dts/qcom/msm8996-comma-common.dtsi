@@ -48,6 +48,11 @@
 	status = "disabled";
 };
 
+&pmi8994_charger {
+	qcom,charging-timeout-mins = <0>;
+	qcom,precharging-timeout-mins = <0>;
+};
+
 &soc {
 	/delete-node/ gen-vkeys;
 
