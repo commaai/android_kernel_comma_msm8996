@@ -360,6 +360,9 @@ struct msm_fb_data_type {
 	bool pending_switch;
 	struct mutex switch_lock;
 	struct input_handler *input_handler;
+#ifdef CONFIG_MACH_COMMA
+	bool is_comma_neos;
+#endif
 };
 
 static inline void mdss_fb_update_notify_update(struct msm_fb_data_type *mfd)
