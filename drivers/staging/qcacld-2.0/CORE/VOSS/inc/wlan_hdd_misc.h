@@ -30,6 +30,7 @@
 
 #ifdef MSM_PLATFORM
 #define WLAN_INI_FILE              "wlan/qca_cld/WCNSS_qcom_cfg.ini"
+#define WLAN_INI_FILE_LEECO        "wlan/qca_cld/WCNSS_qcom_cfg_lepro.ini"
 #define WLAN_CFG_FILE              "wlan/qca_cld/WCNSS_cfg.dat"
 #define WLAN_MAC_FILE              "wlan/qca_cld/wlan_mac.bin"
 #else

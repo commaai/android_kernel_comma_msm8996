@@ -59,6 +59,7 @@
 #include <csrApi.h>
 #include <pmcApi.h>
 #include <wlan_hdd_misc.h>
+#include <linux/comma_board.h>
 
 #if  defined (WLAN_FEATURE_VOWIFI_11R) || defined (FEATURE_WLAN_ESE) || defined(FEATURE_WLAN_LFR)
 static void
@@ -4349,7 +4350,14 @@ VOS_STATUS hdd_parse_config_ini(hdd_context_t* pHddCtx)
 
    memset(cfgIniTable, 0, sizeof(cfgIniTable));
 
+#ifdef CONFIG_MACH_COMMA
+   if (comma_board_id() == COMMA_BOARD_LEECO)
+      status = request_firmware(&fw, WLAN_INI_FILE_LEECO, pHddCtx->parent_dev);
+   else
+      status = request_firmware(&fw, WLAN_INI_FILE, pHddCtx->parent_dev);
+#else
    status = request_firmware(&fw, WLAN_INI_FILE, pHddCtx->parent_dev);
+#endif
 
    if(status)
    {
