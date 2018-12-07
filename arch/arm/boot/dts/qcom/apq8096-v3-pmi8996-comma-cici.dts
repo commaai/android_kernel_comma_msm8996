@@ -10,15 +10,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-#ifndef _COMMA_BOARD_H_
-#define _COMMA_BOARD_H_
 
-enum comma_id {
-	COMMA_BOARD_CICI,
-	COMMA_BOARD_LEECO,
-	COMMA_BOARD_ONEPLUS
+/dts-v1/;
+
+#include "apq8096-v3.dtsi"
+#include "msm-pmi8996.dtsi"
+#include "apq8096-dragonboard.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. APQ8096v3 + PMI8996 microSOM-820";
+	compatible = "qcom,apq8096-dragonboard", "qcom,msm8996",
+			"qcom,apq8096", "qcom,dragonboard";
+	qcom,msm-id = <246 0x30000>, <291 0x30000>,
+			<246 0x30001>, <291 0x30001>;
+	qcom,board-id = <10 28>;
 };
-
-enum comma_id comma_board_id(void);
-
-#endif /* _COMMA_BOARD_H_ */

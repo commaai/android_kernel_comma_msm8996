@@ -27,7 +27,9 @@ static int __init comma_board_init(void)
 {
 	const char *cmdline = saved_command_line;
 
-	if (strstr(cmdline, "android.letv.product"))
+	if (strstr(cmdline, "androidboot.baseband=apq"))
+		board_id = COMMA_BOARD_CICI;
+	else if (strstr(cmdline, "android.letv.product"))
 		board_id = COMMA_BOARD_LEECO;
 	else if (strstr(cmdline, "androidboot.project_name"))
 		board_id = COMMA_BOARD_ONEPLUS;
