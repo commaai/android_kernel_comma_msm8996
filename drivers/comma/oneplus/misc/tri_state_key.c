@@ -21,6 +21,7 @@
 #include <linux/platform_device.h>
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
+#include <linux/switch.h>
 #include <linux/uaccess.h>
 
 #define DRIVER_NAME "tri-state-key"
@@ -42,6 +43,7 @@ struct tristate_data {
 	struct device *dev;
 	struct input_dev *input;
 	struct mutex irq_lock;
+	struct switch_dev sdev;
 	enum key_vals key_codes[NR_STATES];
 	int key_gpios[NR_STATES];
 	uint8_t curr_state;
@@ -83,6 +85,7 @@ static void tristate_process_state(struct tristate_data *t)
 	 */
 	i = ffz(key_state);
 	send_input(t, t->key_codes[i]);
+	switch_set_state(&t->sdev, i + 1);
 }
 
 static irqreturn_t tristate_irq_handler(int irq, void *dev_id)
@@ -278,11 +281,16 @@ static int tristate_probe(struct platform_device *pdev)
 	if (ret)
 		goto free_t;
 
+	t->sdev.name = DRIVER_NAME;
+	ret = switch_dev_register(&t->sdev);
+	if (ret)
+		goto free_t;
+
 	t->input = input_allocate_device();
 	if (!t->input) {
 		dev_err(t->dev, "Failed to allocate input device\n");
 		ret = -ENOMEM;
-		goto free_t;
+		goto switch_unregister;
 	}
 
 	t->input->name = DRIVER_NAME;
@@ -318,6 +326,8 @@ input_unregister:
 	input_unregister_device(t->input);
 free_input:
 	input_free_device(t->input);
+switch_unregister:
+	switch_dev_unregister(&t->sdev);
 free_t:
 	kfree(t);
 	return ret;
