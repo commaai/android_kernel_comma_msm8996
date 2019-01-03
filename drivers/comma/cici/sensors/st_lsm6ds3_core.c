@@ -1764,6 +1764,7 @@ static int st_lsm6ds3_read_raw(struct iio_dev *indio_dev,
 
 		mutex_lock(&sdata->cdata->odr_lock);
 
+#ifndef CONFIG_MACH_COMMA
 		err = st_lsm6ds3_set_enable(sdata, true, false);
 		if (err < 0) {
 			mutex_unlock(&sdata->cdata->odr_lock);
@@ -1776,6 +1777,7 @@ static int st_lsm6ds3_read_raw(struct iio_dev *indio_dev,
 
 		if (sdata->sindex == ST_MASK_ID_GYRO)
 			msleep(120);
+#endif
 
 		err = sdata->cdata->tf->read(sdata->cdata, ch->address,
 				ST_LSM6DS3_BYTE_FOR_CHANNEL, outdata, true);
@@ -1789,7 +1791,9 @@ static int st_lsm6ds3_read_raw(struct iio_dev *indio_dev,
 		*val = (s16)get_unaligned_le16(outdata);
 		*val = *val >> ch->scan_type.shift;
 
+#ifndef CONFIG_MACH_COMMA
 		st_lsm6ds3_set_enable(sdata, false, false);
+#endif
 
 		mutex_unlock(&sdata->cdata->odr_lock);
 		mutex_unlock(&indio_dev->mlock);
@@ -3038,6 +3042,20 @@ int st_lsm6ds3_common_probe(struct lsm6ds3_data *cdata, int irq)
 		st_lsm6ds3_i2c_master_probe(cdata);
 
 	device_init_wakeup(cdata->dev, true);
+
+#ifdef CONFIG_MACH_COMMA
+	/* Always keep accel and gyro enabled in non-buffer mode */
+	for (i = 0; i < ST_INDIO_DEV_NUM; i++) {
+		sdata = iio_priv(cdata->indio_dev[i]);
+
+		switch (i) {
+		case ST_MASK_ID_ACCEL:
+		case ST_MASK_ID_GYRO:
+			st_lsm6ds3_set_enable(sdata, true, false);
+			break;
+		}
+	}
+#endif
 
 	return 0;
 
