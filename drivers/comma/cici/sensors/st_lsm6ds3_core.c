@@ -2938,14 +2938,14 @@ int st_lsm6ds3_common_probe(struct lsm6ds3_data *cdata, int irq)
 		switch (i) {
 		case ST_MASK_ID_ACCEL:
 			sdata->data_out_reg = st_lsm6ds3_accel_ch[0].address;
-			cdata->v_odr[i] = st_lsm6ds3_odr_table.odr_avl[0].hz;
+			cdata->v_odr[i] = st_lsm6ds3_odr_table.odr_avl[3].hz; // default to 104Hz
 			sdata->c_gain[0] = st_lsm6ds3_fs_table[i].fs_avl[0].gain;
 			sdata->cdata->samples_to_discard_2[ST_MASK_ID_ACCEL] = 0;
 			sdata->num_data_channels = 3;
 			break;
 		case ST_MASK_ID_GYRO:
 			sdata->data_out_reg = st_lsm6ds3_gyro_ch[0].address;
-			cdata->v_odr[i] = st_lsm6ds3_odr_table.odr_avl[0].hz;
+			cdata->v_odr[i] = st_lsm6ds3_odr_table.odr_avl[3].hz; // default to 104Hz
 			sdata->c_gain[0] = st_lsm6ds3_fs_table[i].fs_avl[0].gain;
 			sdata->cdata->samples_to_discard_2[ST_MASK_ID_GYRO] = 0;
 			sdata->num_data_channels = 3;
