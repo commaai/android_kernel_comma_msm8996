@@ -711,6 +711,17 @@
 		status = "okay";
 	};
 
+
+	// gpio@c600 { /* GPIO 7 - fan pwm */
+	// 	qcom,mode = <1>;	/* DIGITAL OUT */
+	// 	qcom,pull = <1>;	/* PULL DOWN */
+	// 	qcom,vin-sel = <2>;	 1.8 
+	// 	qcom,src-sel = <7>;	/* LPG4  should this be another selection?? */
+	// 	qcom,master-en = <1>;   /* Enable GPIO */
+	// 	status = "okay";
+	// };
+
+
 	gpio@c700 { /* GPIO 8 - WLAN_EN */
 		qcom,mode = <1>;	/* Digital output*/
 		qcom,pull = <4>;	/* Pulldown 10uA */

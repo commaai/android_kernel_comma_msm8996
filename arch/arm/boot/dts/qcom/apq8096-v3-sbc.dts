@@ -22,5 +22,40 @@
 	compatible = "qcom,apq8096-sbc", "qcom,msm8996",
 			"qcom,apq8096", "qcom,sbc";
 	qcom,board-id = <24 0>;
+	comma,board-name = "cici";
 };
 
+&i2c_6 {
+	memsic@30 {
+		compatible = "memsic,mmc3416x";
+		reg = <0x30>;
+		vdd-supply = <&pm8994_s4>;
+		vio-supply = <&pm8994_s4>;
+		memsic,dir = "obverse-x-axis-forward";
+	};
+
+	lsm6ds3@6a {
+		compatible = "st,lsm6ds3";
+		reg = <0x6a>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <117 IRQ_TYPE_EDGE_RISING>;
+	};
+
+	bosch280@76 {
+		compatible = "bosch,bmp280";
+		reg = <0x76>;
+	};
+
+	rohm@38 {
+		compatible = "rohm,rpr0521";
+		reg = <0x38>;
+	};
+};
+
+&pm8994_s4 {
+	regulator-always-on;
+};
+
+&pmi8994_charger {
+	status = "disabled";
+};
