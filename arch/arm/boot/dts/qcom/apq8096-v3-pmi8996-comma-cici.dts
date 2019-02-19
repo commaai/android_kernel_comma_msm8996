@@ -14,6 +14,7 @@
 /dts-v1/;
 
 #include "apq8096-v3.dtsi"
+#include "msm8996-regulator.dtsi"
 #include "msm-pmi8996.dtsi"
 #include "apq8096-dragonboard.dtsi"
 

@@ -524,6 +524,7 @@
 
 &soc {
 	qcom,cnss {
+		qcom,wlan-indication-enabled;
 		wlan-bootstrap-gpio = <&tlmm 46 0>;
 		wlan-en-gpio = <&pm8994_gpios 8 0>;
 		vdd-wlan-io-supply = <&pm8994_s4>;
