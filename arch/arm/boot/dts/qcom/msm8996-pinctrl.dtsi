@@ -19,6 +19,21 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
+		
+		/* Add Queltec LTE power enable (GPIO79) + USB MUX select (GPIO62) + USB MUX Supply (GPIO63) */
+		queltec_lte: queltec_lte {
+			mux {
+				pins = "gpio79", "gpio63";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio79", "gpio63";
+				drive-strength = <16>; /* 16 mA */
+				bias-disable; /* no pull */
+				output-high;
+			};
+		};
 
 		/* add pingrp for adv7533 */
 		pmx_adv7533: pmx_adv7533 {

@@ -402,6 +402,7 @@
 	vbus_dwc3-supply = <&usb_otg_switch>;
 };
 
+ 
 &usb2s {
 	status = "ok";
 	pinctrl-0 = <&usb_hub_reset_active>;
