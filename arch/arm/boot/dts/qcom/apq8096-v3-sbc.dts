@@ -16,6 +16,7 @@
 #include "apq8096-v3.dtsi"
 #include "msm-pmi8996.dtsi"
 #include "apq8096-sbc.dtsi"
+#include "dsi-panel-dijingILI9881C-720p-video.dtsi"
 
 / {
 	model = "Qualcomm Technologies, Inc. APQ8096v3";

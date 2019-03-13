@@ -40,6 +40,7 @@
 #include <linux/semaphore.h>
 #include <linux/uaccess.h>
 #include <linux/clk/msm-clk.h>
+#include <linux/comma_board.h>
 
 #include <linux/msm-bus.h>
 #include <linux/msm-bus-board.h>
@@ -4354,6 +4355,9 @@ static int mdss_mdp_register_driver(void)
 static int __init mdss_mdp_driver_init(void)
 {
 	int ret;
+
+	if (comma_board_id() == COMMA_BOARD_CICI)
+		strcpy(mdss_mdp_panel, "1:dsi:0:qcom,mdss_dsi_dijing_ILI9881C_720p_video:1:none:cfg:single_dsi");
 
 	ret = mdss_mdp_register_driver();
 	if (ret) {
