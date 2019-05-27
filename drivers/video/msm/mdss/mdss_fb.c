@@ -1959,10 +1959,10 @@ static int mdss_fb_blank(int blank_mode, struct fb_info *info)
 		return ret;
 	}
 
-#ifdef CONFIG_MACH_COMMA
+/*#ifdef CONFIG_MACH_COMMA
 	if (mfd->is_comma_neos && blank_mode != FB_BLANK_UNBLANK)
 		blank_mode = BLANK_FLAG_LP;
-#endif
+#endif*/
 
 	if (mfd->op_enable == 0) {
 		if (blank_mode == FB_BLANK_UNBLANK)

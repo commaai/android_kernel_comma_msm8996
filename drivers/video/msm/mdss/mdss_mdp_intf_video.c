@@ -836,13 +836,13 @@ static int mdss_mdp_video_ctx_stop(struct mdss_mdp_ctl *ctl,
 			frame_rate = 24;
 
 		frame_rate = (1000/frame_rate) + 1;
-		mdss_mdp_turn_off_time_engine(ctl, ctx, frame_rate);
+		//mdss_mdp_turn_off_time_engine(ctl, ctx, frame_rate);
 
 		rc = mdss_mdp_ctl_intf_event(ctl, MDSS_EVENT_PANEL_OFF, NULL,
 			CTL_INTF_EVENT_FLAG_DEFAULT);
 		WARN(rc, "intf %d timegen off error (%d)\n", ctl->intf_num, rc);
 
-		mdss_bus_bandwidth_ctrl(false);
+		//mdss_bus_bandwidth_ctrl(false);
 	}
 
 	mdss_mdp_set_intr_callback(MDSS_MDP_IRQ_INTF_VSYNC,
