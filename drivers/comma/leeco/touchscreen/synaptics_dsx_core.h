@@ -450,6 +450,7 @@ static inline int synaptics_rmi4_reg_read(
 		unsigned char *data,
 		unsigned short len)
 {
+  printk("synaptics_rmi4_reg_read: %d\n", addr);
 	return rmi4_data->hw_if->bus_access->read(rmi4_data, addr, data, len);
 }
 
@@ -459,6 +460,7 @@ static inline int synaptics_rmi4_reg_write(
 		unsigned char *data,
 		unsigned short len)
 {
+  printk("synaptics_rmi4_reg_write: %d\n", addr);
 	return rmi4_data->hw_if->bus_access->write(rmi4_data, addr, data, len);
 }
 

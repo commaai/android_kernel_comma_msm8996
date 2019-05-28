@@ -1576,6 +1576,7 @@ static irqreturn_t synaptics_rmi4_irq(int irq, void *data)
 	struct synaptics_rmi4_data *rmi4_data = data;
 	const struct synaptics_dsx_board_data *bdata =
 			rmi4_data->hw_if->board_data;
+  printk("synaptics_rmi4_irq\n");
 
 	if (gpio_get_value(bdata->irq_gpio) != bdata->irq_on_state)
 		goto exit;
@@ -1594,6 +1595,7 @@ static int synaptics_rmi4_int_enable(struct synaptics_rmi4_data *rmi4_data,
 	unsigned char zero = 0x00;
 	unsigned char *intr_mask;
 	unsigned short intr_addr;
+  printk("synaptics_rmi4_int_enable: %d\n", enable);
 
 	intr_mask = rmi4_data->intr_mask;
 
@@ -1629,6 +1631,7 @@ static int synaptics_rmi4_irq_enable(struct synaptics_rmi4_data *rmi4_data,
 	int retval = 0;
 	const struct synaptics_dsx_board_data *bdata =
 			rmi4_data->hw_if->board_data;
+  printk("synaptics_rmi4_irq_enable: %d %d\n", enable, attn_only);
 
 	if (attn_only) {
 		retval = synaptics_rmi4_int_enable(rmi4_data, enable);
@@ -3275,6 +3278,7 @@ static int synaptics_rmi4_set_gpio(struct synaptics_rmi4_data *rmi4_data)
 	int retval;
 	const struct synaptics_dsx_board_data *bdata =
 			rmi4_data->hw_if->board_data;
+  printk("synaptics_rmi4_set_gpio\n");
 
 	retval = synaptics_rmi4_gpio_setup(
 			bdata->irq_gpio,
@@ -3341,6 +3345,7 @@ static int synaptics_rmi4_get_reg(struct synaptics_rmi4_data *rmi4_data,
 	int retval;
 	const struct synaptics_dsx_board_data *bdata =
 			rmi4_data->hw_if->board_data;
+  printk("synaptics_rmi4_get_reg\n");
 
 	if (!get) {
 		retval = 0;
@@ -3393,6 +3398,7 @@ static int synaptics_rmi4_enable_reg(struct synaptics_rmi4_data *rmi4_data,
 	int retval;
 	const struct synaptics_dsx_board_data *bdata =
 			rmi4_data->hw_if->board_data;
+  printk("synaptics_rmi4_enable_reg\n");
 
 	if (!enable) {
 		retval = 0;
@@ -3536,6 +3542,8 @@ static void synaptics_rmi4_rebuild_work(struct work_struct *work)
 			container_of(delayed_work, struct synaptics_rmi4_data,
 			rb_work);
 
+  printk("synaptics_rmi4_rebuild_work\n");
+
 	mutex_lock(&(rmi4_data->rmi4_reset_mutex));
 
 	mutex_lock(&exp_data.mutex);
@@ -3613,6 +3621,7 @@ static int synaptics_rmi4_reinit_device(struct synaptics_rmi4_data *rmi4_data)
 	struct synaptics_rmi4_fn *fhandler;
 	struct synaptics_rmi4_exp_fhandler *exp_fhandler;
 	struct synaptics_rmi4_device_info *rmi;
+  printk("synaptics_rmi4_reinit_device\n");
 
 	rmi = &(rmi4_data->rmi4_mod_info);
 
@@ -3655,6 +3664,7 @@ static int synaptics_rmi4_reset_device(struct synaptics_rmi4_data *rmi4_data,
 {
 	int retval;
 	struct synaptics_rmi4_exp_fhandler *exp_fhandler;
+  printk("synaptics_rmi4_reset_device\n");
 
 	if (rebuild) {
 		queue_delayed_work(rmi4_data->rb_workqueue,
@@ -3713,6 +3723,7 @@ static void synaptics_rmi4_reset_work(struct work_struct *work)
 	struct synaptics_rmi4_data *rmi4_data =
 			container_of(work, struct synaptics_rmi4_data,
 			reset_work);
+  printk("synaptics_rmi4_reset_work\n");
 
 	timeout = FB_READY_TIMEOUT_S * 1000 / FB_READY_WAIT_MS + 1;
 
@@ -3748,6 +3759,7 @@ static void synaptics_rmi4_sleep_enable(struct synaptics_rmi4_data *rmi4_data,
 	int retval;
 	unsigned char device_ctrl;
 	unsigned char no_sleep_setting = rmi4_data->no_sleep_setting;
+  printk("synaptics_rmi4_sleep_enable: %d\n", enable);
 
 	retval = synaptics_rmi4_reg_read(rmi4_data,
 			rmi4_data->f01_ctrl_base_addr,
@@ -3849,12 +3861,15 @@ static void synaptics_rmi4_esd_check_work(struct work_struct *work)
 	}while((reg_val != check_success) && (retry-- > 0));
 
 	if(reg_val == check_success){
-		/*pr_err("%s:%d esd check success reg_addr=%#x,reg_val=%#x\n",
-				__func__,__LINE__,reg_addr,reg_val);*/
+		pr_err("%s:%d esd check success reg_addr=%#x,reg_val=%#x\n",
+				__func__,__LINE__,reg_addr,reg_val);
 		if(!rmi4_data->suspend){
 			rmi4_data->esd_is_running = false;
 			synaptics_rmi4_esd_switch(rmi4_data,SWITCH_ON);
 		}
+
+    // hax
+		//synaptics_rmi4_sensor_report(rmi4_data, true);
 		return ;
 	}
 
@@ -4124,7 +4139,8 @@ static int synaptics_rmi4_probe(struct platform_device *pdev)
 	}
 #endif
 #ifdef USE_EARLYSUSPEND
-	rmi4_data->early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN + 1;
+	//rmi4_data->early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN + 1;
+	rmi4_data->early_suspend.level = EARLY_SUSPEND_LEVEL_DISABLE_FB + 1;
 	rmi4_data->early_suspend.suspend = synaptics_rmi4_early_suspend;
 	rmi4_data->early_suspend.resume = synaptics_rmi4_late_resume;
 	register_early_suspend(&rmi4_data->early_suspend);
@@ -4634,6 +4650,8 @@ static int synaptics_rmi4_suspend(struct device *dev)
 	struct synaptics_rmi4_exp_fhandler *exp_fhandler;
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 	int retval;
+  printk("synaptics_rmi4_suspend\n");
+  rmi4_data->stay_awake = true;
 
 	if (rmi4_data->stay_awake)
 		return 0;
@@ -4685,6 +4703,7 @@ static int synaptics_rmi4_resume(struct device *dev)
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 	const struct synaptics_dsx_board_data *bdata =
 				rmi4_data->hw_if->board_data;
+  printk("synaptics_rmi4_resume\n");
 
 	if (rmi4_data->stay_awake)
 		return 0;
