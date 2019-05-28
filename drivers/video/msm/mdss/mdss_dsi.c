@@ -246,7 +246,7 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
 
-	ret = mdss_dsi_panel_reset(pdata, 0);
+	/*ret = mdss_dsi_panel_reset(pdata, 0);
 	if (ret) {
 		pr_warn("%s: Panel reset failed. rc=%d\n", __func__, ret);
 		ret = 0;
@@ -255,7 +255,7 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 	if (mdss_dsi_pinctrl_set_state(ctrl_pdata, false))
 		pr_debug("reset disable: pinctrl not enabled\n");
 
-	/*ret = msm_dss_enable_vreg(
+	ret = msm_dss_enable_vreg(
 		ctrl_pdata->panel_power_data.vreg_config,
 		ctrl_pdata->panel_power_data.num_vreg, 0);
 	if (ret)
@@ -1127,7 +1127,7 @@ static int mdss_dsi_off(struct mdss_panel_data *pdata, int power_state)
 	 * registers. For video mode panel, turn off link clocks and then
 	 * disable PHY
 	 */
-	if (pdata->panel_info.type == MIPI_CMD_PANEL)
+	/*if (pdata->panel_info.type == MIPI_CMD_PANEL)
 		mdss_dsi_clk_ctrl(ctrl_pdata, ctrl_pdata->dsi_clk_handle,
 					MDSS_DSI_CORE_CLK, MDSS_DSI_CLK_ON);
 	else
@@ -1135,16 +1135,16 @@ static int mdss_dsi_off(struct mdss_panel_data *pdata, int power_state)
 				  MDSS_DSI_LINK_CLK, MDSS_DSI_CLK_OFF);
 
 	if (!pdata->panel_info.ulps_suspend_enabled) {
-		/* disable DSI controller */
+		// disable DSI controller
 		mdss_dsi_controller_cfg(0, pdata);
 
-		/* disable DSI phy */
+		// disable DSI phy
 		mdss_dsi_phy_disable(ctrl_pdata);
 	}
 	ctrl_pdata->ctrl_state &= ~CTRL_STATE_DSI_ACTIVE;
 
 	mdss_dsi_clk_ctrl(ctrl_pdata, ctrl_pdata->dsi_clk_handle,
-			  MDSS_DSI_CORE_CLK, MDSS_DSI_CLK_OFF);
+			  MDSS_DSI_CORE_CLK, MDSS_DSI_CLK_OFF);*/
 
 panel_power_ctrl:
 	ret = mdss_dsi_panel_power_ctrl(pdata, power_state);
@@ -2446,7 +2446,6 @@ static int mdss_dsi_event_handler(struct mdss_panel_data *pdata,
 		ctrl_pdata->ctrl_state &= ~CTRL_STATE_MDP_ACTIVE;
 		if (ctrl_pdata->off_cmds.link_state == DSI_LP_MODE)
 			rc = mdss_dsi_blank(pdata, power_state);
-    break;
 		rc = mdss_dsi_off(pdata, power_state);
 		break;
 	case MDSS_EVENT_CONT_SPLASH_FINISH:

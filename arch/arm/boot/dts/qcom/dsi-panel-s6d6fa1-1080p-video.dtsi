@@ -55,12 +55,10 @@
 			29 01 00 00 00 00 03 FC A5 A5
 		];
 		qcom,mdss-dsi-off-command = [
-			05 01 00 00 32 00 02 28 00
-      /* breaks panel with jenky wake up */
-			05 01 00 00 78 00 02 10 00
-      /* enter sleep mode? */
+			05 01 00 00 32 00 01 28
+			05 01 00 00 78 00 01 10
+      /* turn it back on? */
 			05 01 00 00 78 00 01 11
-      /* exit sleep mode, wait 120ms */
 		];
 		qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 		qcom,mdss-dsi-panel-timings-8996 = [

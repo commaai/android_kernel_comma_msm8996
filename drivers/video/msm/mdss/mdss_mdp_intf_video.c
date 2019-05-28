@@ -842,7 +842,7 @@ static int mdss_mdp_video_ctx_stop(struct mdss_mdp_ctl *ctl,
 			CTL_INTF_EVENT_FLAG_DEFAULT);
 		WARN(rc, "intf %d timegen off error (%d)\n", ctl->intf_num, rc);
 
-		//mdss_bus_bandwidth_ctrl(false);
+		mdss_bus_bandwidth_ctrl(false);
 	}
 
 	mdss_mdp_set_intr_callback(MDSS_MDP_IRQ_INTF_VSYNC,
