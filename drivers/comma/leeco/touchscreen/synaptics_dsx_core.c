@@ -4474,8 +4474,13 @@ static int synaptics_rmi4_fb_notifier_cb(struct notifier_block *self,
 	if (evdata && evdata->data && rmi4_data) {
 		if (event == FB_EVENT_BLANK) {
 			transition = evdata->data;
-			if (*transition == FB_BLANK_UNBLANK)
+			if (*transition == FB_BLANK_UNBLANK) {
 				schedule_work(&rmi4_data->fb_notify_work);
+			} else {
+				flush_work(&rmi4_data->fb_notify_work);
+				synaptics_rmi4_suspend(&rmi4_data->pdev->dev);
+				rmi4_data->fb_ready = false;
+			}
 		}
 	}
 
@@ -4635,7 +4640,7 @@ static int synaptics_rmi4_suspend(struct device *dev)
 	struct synaptics_rmi4_data *rmi4_data = dev_get_drvdata(dev);
 	int retval;
 
-	if (rmi4_data->stay_awake)
+	if (rmi4_data->stay_awake || rmi4_data->suspend)
 		return 0;
 #ifdef ESD_CHECK_SUPPORT
 	synaptics_rmi4_esd_switch(rmi4_data,SWITCH_OFF);
@@ -4686,7 +4691,7 @@ static int synaptics_rmi4_resume(struct device *dev)
 	const struct synaptics_dsx_board_data *bdata =
 				rmi4_data->hw_if->board_data;
 
-	if (rmi4_data->stay_awake)
+	if (rmi4_data->stay_awake || !rmi4_data->suspend)
 		return 0;
 
 	if (rmi4_data->ts_pinctrl) {
