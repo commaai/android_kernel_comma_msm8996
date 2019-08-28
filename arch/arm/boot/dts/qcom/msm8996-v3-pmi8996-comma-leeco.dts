@@ -39,6 +39,10 @@
 	};
 };
 
+&pil_gpu {
+	qcom,firmware-name = "a530_zap-722";
+};
+
 &tlmm {
 	/delete-node/ cam_sensor_front_active;
 	/delete-node/ cam_sensor_front_suspend;
