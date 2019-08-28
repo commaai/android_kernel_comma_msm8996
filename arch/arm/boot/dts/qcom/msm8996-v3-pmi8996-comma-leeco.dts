@@ -13,17 +13,15 @@
 
 /dts-v1/;
 
-#include "msm8996pro.dtsi"
+#include "msm8996-v3.0.dtsi"
 #include "msm-pmi8996.dtsi"
 #include "msm8996-mtp.dtsi"
 #include "msm8996-comma-common.dtsi"
 #include "dsi-panel-s6d6fa1-1080p-video.dtsi"
 
 / {
-	model = "Letv Technologies, Inc. MSM 8996pro + PMI8996 LE_ZL1";
+	model = "Letv Technologies, Inc. MSM 8996 v3 + PMI8996 LE_ZL0";
 	compatible = "qcom,msm8996-mtp", "qcom,msm8996", "qcom,mtp";
-  // X727 is <8 0xA2>
-  // X722 is also <8 0xA2> ...
 	qcom,board-id = <8 0xA1>, <8 0xA2>, <8 0xA4>, <8 0xA5>;
 	comma,board-name = "leeco";
 
@@ -39,6 +37,10 @@
 			label = "ramoops_mem";
 		};
 	};
+};
+
+&pil_gpu {
+	qcom,firmware-name = "a530_zap-722";
 };
 
 &tlmm {

@@ -1,3 +1,5 @@
+To make adb work, revert 33288e7ddc76200ab06d863e19ff15c2b55017dc and e2bf4be277e0c9cfdf674f91389773c40ccc02b3
+
         Linux kernel release 3.x <http://kernel.org/>
 
 These are the release notes for Linux version 3.  Read them carefully,
