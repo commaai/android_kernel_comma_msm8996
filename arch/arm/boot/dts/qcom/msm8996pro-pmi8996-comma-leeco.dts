@@ -18,6 +18,7 @@
 #include "msm8996-mtp.dtsi"
 #include "msm8996-comma-common.dtsi"
 #include "dsi-panel-s6d6fa1-1080p-video.dtsi"
+#include "dsi-panel-ft8716-1080p-video.dtsi"
 
 / {
 	model = "Letv Technologies, Inc. MSM 8996pro + PMI8996 LE_ZL1";
