@@ -1286,10 +1286,12 @@ static int fb_notifier_callback(struct notifier_block *self,
 	if (evdata && evdata->data && event == FB_EVENT_BLANK &&
 			fts_data && fts_data->client) {
 		blank = evdata->data;
-		if (*blank == FB_BLANK_UNBLANK)
+		if (*blank == FB_BLANK_UNBLANK) {
 			schedule_work(&fts_data->resume_work);
-		else if (*blank == FB_BLANK_POWERDOWN)
-			schedule_work(&fts_data->suspend_work);
+		} else if (*blank == FB_BLANK_POWERDOWN) {
+			//schedule_work(&fts_data->suspend_work);
+      pr_warn("hacked to NOT call schedule_work(&fts_data->suspend_work)\n");
+    }
 	}
 
 	return 0;
