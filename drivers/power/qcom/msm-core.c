@@ -396,7 +396,7 @@ static int update_userspace_power(struct sched_params __user *argp)
 		}
 	}
 
-	if ((cpu < 0) || (cpu >= num_possible_cpus())
+	if ((cpu < 0) || (cpu >= num_possible_cpus()))
 		return -EINVAL;
 
 	node = &activity[cpu];
