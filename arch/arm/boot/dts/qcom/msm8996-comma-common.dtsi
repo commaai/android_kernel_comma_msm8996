@@ -35,11 +35,6 @@
 	status = "disabled";
 };
 
-&msm_cpufreq {
-	qcom,cpufreq-table-0 = <1593600>;
-	qcom,cpufreq-table-2 = <1670400>;
-};
-
 &pcie1 {
 	status = "disabled";
 };
