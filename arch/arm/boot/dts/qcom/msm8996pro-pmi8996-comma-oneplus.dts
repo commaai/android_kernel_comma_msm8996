@@ -810,4 +810,24 @@
 			/delete-node/ qcom,pon_3;
 		};
 	};
+    qcom,pmi8994@2 {
+        qcom,leds@a300 {
+            compatible = "qcom,leds-qpnp";
+            reg = <0xa300 0x100>;
+            status = "okay";
+
+            qcom,led_mpp_4 {
+                label = "mpp";
+                linux,name = "button-backlight";
+                linux,default-trigger = "none";
+                qcom,default-state = "off";
+                qcom,max-current = <40>;
+                qcom,current-setting = <5>;
+                qcom,id = <6>;
+                qcom,mode = "manual";
+                qcom,source-sel = <1>;
+                qcom,mode-ctrl = <0x60>;
+            };
+        };
+    };
 };
