@@ -4475,11 +4475,10 @@ static int synaptics_rmi4_fb_notifier_cb(struct notifier_block *self,
 		if (event == FB_EVENT_BLANK) {
 			transition = evdata->data;
 			if (*transition == FB_BLANK_POWERDOWN) {
-        pr_warn("hacked to NOT call synaptics_rmi4_suspend\n");
-				/*if(flush_work(&rmi4_data->fb_notify_work))
+				if(flush_work(&rmi4_data->fb_notify_work))
 					pr_warn("%s: waited resume work finished!\n",__func__);
 				synaptics_rmi4_suspend(&rmi4_data->pdev->dev);
-				rmi4_data->fb_ready = false;*/
+				rmi4_data->fb_ready = false;
 			} else if (*transition == FB_BLANK_UNBLANK) {
 				schedule_work(&rmi4_data->fb_notify_work);
 			}
