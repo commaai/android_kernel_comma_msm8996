@@ -238,10 +238,10 @@
 		/delete-property/ qcom,wsa-max-devs;
 	};
 
-        # Set KTM default temperatures beyond the hardware watchdog limit
-        # of ~115C. We want msm-thermal available for later use, but we
-        # don't want it to do anything unless and until instructed by the
-        # qcom thermal-engine or its clients.
+        /* Set KTM default temperatures beyond the hardware watchdog limit
+         * of ~115C. We want msm-thermal available for later use, but we
+         * don't want it to do anything unless and until instructed by the
+         * qcom thermal-engine or its clients. */
         qcom,msm-thermal {
                 qcom,limit-temp = <120>;
                 qcom,temp-hysteresis = <5>;
