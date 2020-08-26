@@ -64,7 +64,7 @@
 #define TYPE_B_PROTOCOL
 #endif
 
-#define WAKEUP_GESTURE true
+#define WAKEUP_GESTURE false
 
 #define SYNAPTICS_CLASS_NAME      "synaptics_fp"
 #define TP_STATUS_OK   1
