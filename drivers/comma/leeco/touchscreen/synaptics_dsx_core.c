@@ -64,7 +64,7 @@
 #define TYPE_B_PROTOCOL
 #endif
 
-#define WAKEUP_GESTURE false
+#define WAKEUP_GESTURE true
 
 #define SYNAPTICS_CLASS_NAME      "synaptics_fp"
 #define TP_STATUS_OK   1
@@ -4474,8 +4474,14 @@ static int synaptics_rmi4_fb_notifier_cb(struct notifier_block *self,
 	if (evdata && evdata->data && rmi4_data) {
 		if (event == FB_EVENT_BLANK) {
 			transition = evdata->data;
-			if (*transition == FB_BLANK_UNBLANK)
+			if (*transition == FB_BLANK_POWERDOWN) {
+				if(flush_work(&rmi4_data->fb_notify_work))
+					pr_warn("%s: waited resume work finished!\n",__func__);
+				synaptics_rmi4_suspend(&rmi4_data->pdev->dev);
+				rmi4_data->fb_ready = false;
+			} else if (*transition == FB_BLANK_UNBLANK) {
 				schedule_work(&rmi4_data->fb_notify_work);
+			}
 		}
 	}
 
