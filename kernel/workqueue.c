@@ -3324,7 +3324,11 @@ struct workqueue_attrs *alloc_workqueue_attrs(gfp_t gfp_mask)
 	if (!alloc_cpumask_var(&attrs->cpumask, gfp_mask))
 		goto fail;
 
-	cpumask_copy(attrs->cpumask, cpu_possible_mask);
+	// COMMA HACK: only allow unbound kworkers on cores 0-2
+	cpumask_copy(attrs->cpumask, cpumask_of(0));
+	cpumask_or(attrs->cpumask, attrs->cpumask, cpumask_of(1));
+	cpumask_or(attrs->cpumask, attrs->cpumask, cpumask_of(2));
+	//cpumask_copy(attrs->cpumask, cpu_possible_mask);
 	return attrs;
 fail:
 	free_workqueue_attrs(attrs);
