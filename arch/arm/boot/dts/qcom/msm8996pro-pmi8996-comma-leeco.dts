@@ -505,6 +505,21 @@
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 };
 
+&dsi_ft8716_1080p_video {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_wled";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,cont-splash-enabled;
+	qcom,rst-timing-compatible;
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+
+	qcom,mdss-dsi-panel-timings-8996 = [23 1e 07 08 05 03 04 a0
+		23 1e 07 08 05 03 04 a0
+		23 1e 07 08 05 03 04 a0
+		23 1e 07 08 05 03 04 a0
+		23 19 07 08 05 03 04 a0];
+};
+
 &mtp_batterydata {
 	qcom,letv_zl1_lishen_4000mah {
 		qcom,battery-type = "letv_zl1_lishen";

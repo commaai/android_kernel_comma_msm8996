@@ -2672,23 +2672,10 @@ static int fb_notifier_callback(struct notifier_block *self, unsigned long event
 	if (event != FB_EARLY_EVENT_BLANK)
 		return NOTIFY_OK;
 
-	switch (*blank) {
-	case FB_BLANK_UNBLANK:
-	case FB_BLANK_VSYNC_SUSPEND:
-	case FB_BLANK_NORMAL:
-		if (ts->screen_off) {
-			cancel_work_sync(&ts->pm_work);
-			ts->screen_off = 0;
-			queue_work(system_highpri_wq, &ts->pm_work);
-		}
-		break;
-	case FB_BLANK_POWERDOWN:
-		if (!ts->screen_off) {
-			cancel_work_sync(&ts->pm_work);
-			ts->screen_off = 1;
-			queue_work(system_highpri_wq, &ts->pm_work);
-		}
-		break;
+	if (*blank == FB_BLANK_UNBLANK && ts->screen_off) {
+		cancel_work_sync(&ts->pm_work);
+		ts->screen_off = 0;
+		queue_work(system_highpri_wq, &ts->pm_work);
 	}
 
 	return NOTIFY_OK;

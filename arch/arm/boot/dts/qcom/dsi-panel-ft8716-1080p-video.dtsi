@@ -54,8 +54,6 @@
 		qcom,mdss-dsi-reset-sequence = <1 5>, <0 5>, <1 5>;
 		qcom,mdss-dsi-t-clk-post = <0x04>;
 		qcom,mdss-dsi-t-clk-pre = <0x2b>;
-		qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_wled";
-		qcom,mdss-dsi-bl-min-level = <1>;
 		qcom,mdss-dsi-bl-max-level = <4095>;
 		qcom,mdss-brightness-max-level = <255>;
 		qcom,mdss-dsi-dma-trigger = "trigger_sw";
@@ -124,7 +122,5 @@
 		qcom,esd-check-enabled;
 		/*qcom,mdss-dsi-rx-eot-ignore;*/
 		/*qcom,mdss-dsi-tx-eot-append;*/
-
-		qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 	};
 };
