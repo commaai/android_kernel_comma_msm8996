@@ -1868,7 +1868,7 @@ static int __init l2tp_init(void)
 	if (rc)
 		goto out;
 
-	l2tp_wq = alloc_workqueue("l2tp", WQ_UNBOUND | WQ_SYSFS, 0);
+	l2tp_wq = alloc_workqueue("l2tp", WQ_UNBOUND, 0);
 	if (!l2tp_wq) {
 		pr_err("alloc_workqueue failed\n");
 		rc = -ENOMEM;
