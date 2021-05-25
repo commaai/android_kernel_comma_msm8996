@@ -586,7 +586,8 @@
 		qcom,cpr-count-repeat = <25>;
 
 		qcom,apm-ctrl = <&apc_apm>;
-		qcom,apm-threshold-voltage = <850000>;
+		//qcom,apm-threshold-voltage = <850000>;
+		qcom,apm-threshold-voltage = <0>;   /* Switch to use VDD_APCC instead of VDD_MX always */
 		qcom,apm-hysteresis-voltage = <5000>;
 		qcom,system-supply-max-voltage = <1015000>;
 		qcom,mem-acc-supply-threshold-voltage = <700000>;
