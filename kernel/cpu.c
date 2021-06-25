@@ -754,6 +754,19 @@ static DECLARE_BITMAP(cpu_active_bits, CONFIG_NR_CPUS) __read_mostly;
 const struct cpumask *const cpu_active_mask = to_cpumask(cpu_active_bits);
 EXPORT_SYMBOL(cpu_active_mask);
 
+static DECLARE_BITMAP(cpu_kthread_bits, CONFIG_NR_CPUS) __read_mostly
+	= CPU_BITS_ALL;
+const struct cpumask *const cpu_kthread_mask = to_cpumask(cpu_kthread_bits);
+EXPORT_SYMBOL(cpu_kthread_mask);
+
+static int __init kthread_setup(char *str)
+{
+        cpulist_parse(str, (struct cpumask *)&cpu_kthread_bits);
+        return 1;
+}
+__setup("kthread=", kthread_setup);
+
+
 void set_cpu_possible(unsigned int cpu, bool possible)
 {
 	if (possible)
