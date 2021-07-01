@@ -319,6 +319,7 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 		 */
 		sched_setscheduler_nocheck(task, SCHED_NORMAL, &param);
 		set_cpus_allowed_ptr(task, cpu_all_mask);
+		set_cpus_allowed_ptr(task, cpu_kthread_mask);
 	}
 	kfree(create);
 	return task;
@@ -488,6 +489,7 @@ int kthreadd(void *unused)
 	set_task_comm(tsk, "kthreadd");
 	ignore_signals(tsk);
 	set_cpus_allowed_ptr(tsk, cpu_all_mask);
+	set_cpus_allowed_ptr(tsk, cpu_kthread_mask);
 	set_mems_allowed(node_states[N_MEMORY]);
 
 	current->flags |= PF_NOFREEZE;

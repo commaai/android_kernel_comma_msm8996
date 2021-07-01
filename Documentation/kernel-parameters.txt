@@ -1623,6 +1623,16 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
 	kstack=N	[X86] Print N words from the kernel stack
 			in oops dumps.
 
+	kthread=	[KNL, SMP] Only run kernel threads on the specified
+			list of processors. The kernel will start threads
+			on the indicated processors only (unless there
+			are specific reasons to run a thread with
+			different affinities). This can be used to make
+			init start on certain processors and also to
+			control where kmod and other user space threads
+			are being spawned. Allows to keep kernel threads
+			away from certain cores unless absoluteluy necessary.
+
 	kvm.ignore_msrs=[KVM] Ignore guest accesses to unhandled MSRs.
 			Default is 0 (don't ignore, but inject #GP)
 

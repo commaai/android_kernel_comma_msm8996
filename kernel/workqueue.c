@@ -3815,6 +3815,7 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
 	/* make a copy of @attrs and sanitize it */
 	copy_workqueue_attrs(new_attrs, attrs);
 	cpumask_and(new_attrs->cpumask, new_attrs->cpumask, cpu_possible_mask);
+	cpumask_and(new_attrs->cpumask, new_attrs->cpumask, cpu_kthread_mask);
 
 	/*
 	 * We may create multiple pwqs with differing cpumasks.  Make a
@@ -4583,6 +4584,7 @@ static void restore_unbound_workers_cpumask(struct worker_pool *pool, int cpu)
 
 	/* is @cpu the only online CPU? */
 	cpumask_and(&cpumask, pool->attrs->cpumask, cpu_online_mask);
+	cpumask_and(&cpumask, pool->attrs->cpumask, cpu_kthread_mask);
 	if (cpumask_weight(&cpumask) != 1)
 		return;
 
