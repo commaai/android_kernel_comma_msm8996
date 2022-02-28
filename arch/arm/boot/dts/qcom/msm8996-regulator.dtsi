@@ -640,6 +640,7 @@
 				qcom,ldo-min-headroom-voltage = <150000>;
 				qcom,ldo-max-headroom-voltage = <470000>;
 				qcom,ldo-max-voltage = <890000>;
+				qcom,ldo-disable;
 				qcom,uses-mem-acc;
 
 				qcom,cpr-corner-fmax-map =
@@ -1260,6 +1261,7 @@
 				qcom,ldo-min-headroom-voltage = <150000>;
 				qcom,ldo-max-headroom-voltage = <470000>;
 				qcom,ldo-max-voltage = <890000>;
+				qcom,ldo-disable;
 				qcom,uses-mem-acc;
 
 				qcom,cpr-corner-fmax-map =
